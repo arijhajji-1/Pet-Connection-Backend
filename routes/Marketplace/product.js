@@ -15,7 +15,12 @@ const productController = require('../../controller/productController');
     }
 });*/
 router.get("/getAll", productController.getAllProducts);
+router.get("/getAllF", productController.getAll);
 
+router.get("/getProduct/:id", productController.getProductById);
+router.post("/add", productController.addNewProduct);
+router.put("/update/:id", productController.updateProduct);
+router.delete("/delete/:id", productController.deleteProduct);
 
 
 module.exports = router; 
