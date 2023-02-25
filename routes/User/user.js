@@ -77,9 +77,6 @@ router.get("/all", (req, res, next) => {
 })
 
 
-
-// =========== token validation ============
-
 router.get("/profile", validateToken, (req, res) => {
     res.json("profile");
 })
