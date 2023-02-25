@@ -1,5 +1,88 @@
 const Product = require("../models/product")
-exports.getAllProducts =  async (req, res) => {
+const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+
+
+const { sign, verify } = require('jsonwebtoken')
+
+
+
+
+
+exports.getAllproducts = async  (req, res) => {
+  try {
+    
+      const accessToken = req.cookies["access-token"];
+
+      if (!accessToken) {
+        return res.status(401).json({ message: "Access token not found" });
+      }
+     
+        const decodedToken = verify(accessToken, "azjdn1dkd3ad");
+         
+        req.userId = decodedToken.id;
+  
+        const user = await User.findById(req.userId );
+   
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const data = await Product.find({});
+    res.send(data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// POST a new product for a user
+exports.addProduct = async  (req, res) => {
+    
+  const accessToken = req.cookies["access-token"];
+
+  if (!accessToken) {
+    return res.status(401).json({ message: "Access token not found" });
+  }
+ 
+    const decodedToken = verify(accessToken, "azjdn1dkd3ad");
+     
+    req.userId = decodedToken.id;
+const user = await User.findById(req.userId );
+
+
+
+  const newProduct = new Product({
+    name: req.body.name,
+    desc: req.body.desc,
+    img: req.body.img,
+    categories: req.body.categories,
+    price: req.body.price,
+    user: user,
+  })
+    try{
+const savedProduct = await newProduct.save();
+res.status(200).json(savedProduct)
+    }catch(err){
+        res.status(500).json(err);
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*exports.getAllProducts =  async (req, res) => {
   try {
     const data = await Product.find({});
     res.send(data);
@@ -66,3 +149,5 @@ exports.getProductById = async (req, res) => {
       console.log(error);
     }
   }
+
+*/

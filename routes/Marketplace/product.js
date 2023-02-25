@@ -3,24 +3,25 @@ const router = express.Router();
 const Product = require('../../models/product')
 const bodyparser = require("body-parser")
 const productController = require('../../controller/productController');
+const bcrypt = require("bcrypt"); 
+const cookieParser = require("cookie-parser")
 
-/*router.post("/add" , async (req, res) => {
-    const product = new Product(req.body);
+router.use(express.json())
+router.use(cookieParser())
 
-    try{
-        const savedProduct = await product.save();
-        res.status(200).json(savedProduct)
-    }catch (err){
-        res.status(500).json(err);
-    }
-});*/
-router.get("/getAll", productController.getAllProducts);
+const { validateToken } = require('../JWT/JWT'); 
+
+router.post("/addProduct",validateToken,productController.addProduct);
+router.get("/getAll",validateToken,productController.getAllproducts);
+
+/*router.get("/getAll", productController.getAllProducts);
 router.get("/getAllF", productController.getAll);
 
 router.get("/getProduct/:id", productController.getProductById);
 router.post("/add", productController.addNewProduct);
 router.put("/update/:id", productController.updateProduct);
-router.delete("/delete/:id", productController.deleteProduct);
+router.delete("/delete/:id", productController.deleteProduct);*/
+const { sign, verify } = require('jsonwebtoken')
 
 
 module.exports = router; 
