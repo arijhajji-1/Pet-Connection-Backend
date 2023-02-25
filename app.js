@@ -23,12 +23,14 @@ app.use(bodyParser.json());
 
 
 
-// ============ routes =================
+// ============ routes user =================
 var useRouter = require('./routes/User/user'); 
 app.use('/user', useRouter); 
 
+//============= router Pet =================
 
-
+var petRouter = require('./routes/Pet/pet'); 
+app.use('/pet', petRouter); 
 
 
 

@@ -10,6 +10,13 @@ var User = new schema({
     password: {
         type: String,
         required: true 
-    }
+    },
+    //relation pet user 
+    pets: [
+        {
+          type: schema.Types.ObjectId,
+          ref: 'Pet'
+        }
+      ]
 }); 
 module.exports = mongo.model("user", User)

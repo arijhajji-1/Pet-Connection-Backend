@@ -15,6 +15,7 @@ const validateToken = (req,res,next) => {
         const validToken = verify(accessToken, "azjdn1dkd3ad"); 
         if (validToken) {
             req.authenticated = true; 
+            
             return next(); 
         }
     } catch (err) {
