@@ -27,8 +27,6 @@ app.use(bodyParser.json());
 var useRouter = require('./routes/User/user'); 
 app.use('/user', useRouter); 
 
-var productRouter = require('./routes/Marketplace/product'); 
-app.use('/', productRouter); 
 
 
 
