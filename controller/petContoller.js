@@ -51,6 +51,7 @@ async function addPet(req, res, next) {
     }
   }
 // POST a new pet for a user
+/*
  async function addPetwithUser (req, res)  {
     
         const accessToken = req.cookies["access-token"];
@@ -80,7 +81,44 @@ async function addPet(req, res, next) {
     
         res.status(201).json({ message: 'Pet added successfully' });
       
+    }*/
+    //=================================================================================================================================test
+    async function addPetwithUser (req, res)  {
+    
+        const accessToken = req.cookies["access-token"];
+
+        if (!accessToken) {
+          return res.status(401).json({ message: "Access token not found" });
+        }
+       
+          const decodedToken = verify(accessToken, "azjdn1dkd3ad");
+           
+          req.userId = decodedToken.id;
+    const user = await User.findById(req.userId );
+ 
+
+        // Create a new pet document and add it to the user's pets array
+        const Pet = new pet({
+          name: req.body.name,
+          color: req.body.color,
+          breed: req.body.breed,
+          age: req.body.age,
+          categoryPet: req.body.categoryPet,
+          user: user,
+          images: req.files.map((file) => file.filename),
+        });
+        await Pet.save();
+        user.pets.push(Pet._id);
+        await user.save();
+    
+        res.status(201).json({ message: 'Pet added successfully' });
+      
     }
+
+
+
+
+
 
 //delete pet from user
 
@@ -116,6 +154,10 @@ catch (error) {
     res.status(500).json({ error: 'Server error' });
   }
 }
+
+
+
+
   module.exports={
     addPet,getAllpets,addPetwithUser,deletepet
   }

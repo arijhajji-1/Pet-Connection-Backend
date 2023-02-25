@@ -23,11 +23,16 @@ const petSchema = new mongoose.Schema({
     enum: ['dog', 'cat', 'bird', 'reptile', 'other'],
     required: true
   },
-  
+// relation user pet 
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  }
+  },
+  //upload list of images 
+  images: [{
+    type: String,
+   
+  }],
 });
 
 const Pet = mongoose.model('Pet', petSchema);

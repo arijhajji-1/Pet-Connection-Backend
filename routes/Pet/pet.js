@@ -10,9 +10,20 @@ router.use(express.json())
 router.use(cookieParser())
 
 const { validateToken } = require('../JWT/JWT'); 
+const multer = require("multer");
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/uploads");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
 router.post("/addpet",validateToken,controller.addPet);
-router.post("/addpetwithUser",validateToken,controller.addPetwithUser);
+router.post("/addpetwithUser",validateToken,upload.array("images"),controller.addPetwithUser);
 router.get('/AllpetsByUser',validateToken,controller.getAllpets);
 router.delete('/deletepet/:petId',validateToken,controller.deletepet);
 const { sign, verify } = require('jsonwebtoken')
