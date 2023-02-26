@@ -12,13 +12,17 @@ router.use(cookieParser())
 const { validateToken } = require('../JWT/JWT'); 
 
 router.post("/addProduct",validateToken,productController.addProduct);
-router.get("/getAll",validateToken,productController.getAllproducts);
+router.get("/getAllU",validateToken,productController.getAllproducts);
 router.delete("/delete/:id",validateToken,productController.deleteproduct)
-
-/*router.get("/getAll", productController.getAllProducts);
 router.get("/getAllF", productController.getAll);
-
 router.get("/getProduct/:id", productController.getProductById);
+router.put("/update/:id",validateToken, productController.updateProduct);
+router.delete("/deletee/:id", productController.deleteProduct);
+
+
+/*
+router.get("/getAll", productController.getAllProducts);
+
 router.post("/add", productController.addNewProduct);
 router.put("/update/:id", productController.updateProduct);
 router.delete("/delete/:id", productController.deleteProduct);*/

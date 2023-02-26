@@ -8,7 +8,7 @@ const { sign, verify } = require('jsonwebtoken')
 
 
 
-
+// Get All only with user 
 exports.getAllproducts = async  (req, res) => {
   try {
     
@@ -29,6 +29,38 @@ exports.getAllproducts = async  (req, res) => {
     }
     const data = await Product.find({});
     res.send(data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+//find avec category :http://localhost:3000/getAllF?category=aaa
+//new=true w ta3tini 1 puisque limit(1):http://localhost:3000/getAllF?new=true
+exports.getAll = async (req, res) => {
+  const qNew = req.query.new;
+  const qCategory = req.query.category;
+  try {
+      let products;
+      if(qNew){
+          products = await Product.find().sort({createdAt: -1}).limit(1)
+      } else if(qCategory){
+          products = await Product.find({categories:{
+              $in: [qCategory],
+          },
+      });
+      } else {
+          products = await Product.find();
+      }
+      res.status(200).json(products);
+  } catch (err){
+      console.log(err);
+  }
+}
+
+exports.getProductById = async (req, res) => {
+  try {
+    const data = await Product.findById(req.params.id);
+    res.send(data)  
   } catch (error) {
     console.log(error);
   }
@@ -62,8 +94,38 @@ res.status(200).json(savedProduct)
     }catch(err){
         res.status(500).json(err);
     }
-
 }
+exports.deleteProduct = async (req, res) => {
+  try {
+    await Product.findByIdAndRemove(req.params.Productid);
+    res.status(200).json("Product Deleted")
+  } catch (error) {
+    res.status(500).json(error);
+  }
+}
+
+exports.updateProduct = async (req, res) => {
+  const accessToken = req.cookies["access-token"];
+
+  if (!accessToken) {
+    return res.status(401).json({ message: "Access token not found" });
+  }
+ 
+    const decodedToken = verify(accessToken, "azjdn1dkd3ad");
+     
+    req.userId = decodedToken.id;
+const user = await User.findById(req.userId );
+  try {
+    await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    await user.save();
+    res.send("Product Updated")
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+ 
+//habtch t5dm baad ma knt t5dm
 exports.deleteproduct = async  (req, res) => {
   try{
   //get user 
@@ -79,7 +141,7 @@ exports.deleteproduct = async  (req, res) => {
 
     const user = await User.findById(req.userId );
   // Find the pet to be removed
-  const product = await Product.findById(req.params.id);
+  const product = await Product.findById(req.params.productId);
   if (!product) {
       return res.status(404).json({ error: 'product not found' });
     }
@@ -96,7 +158,6 @@ catch (error) {
   res.status(500).json({ error: 'Server error' });
 }
 }
-
 
 
 
@@ -147,37 +208,5 @@ exports.deleteProduct = async (req, res) => {
     }
   }
 
-
-//find avec category :http://localhost:3000/getAllF?category=aaa
-//new=true w ta3tini 1 puisque limit(1):http://localhost:3000/getAllF?new=true
-exports.getAll = async (req, res) => {
-    const qNew = req.query.new;
-    const qCategory = req.query.category;
-    try {
-        let products;
-        if(qNew){
-            products = await Product.find().sort({createdAt: -1}).limit(1)
-        } else if(qCategory){
-            products = await Product.find({categories:{
-                $in: [qCategory],
-            },
-        });
-        } else {
-            products = await Product.find();
-        }
-        res.status(200).json(products);
-    } catch (err){
-        console.log(err);
-    }
-}
-  
-exports.getProductById = async (req, res) => {
-    try {
-      const data = await Product.findById(req.params.id);
-      res.send(data)  
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
 */
