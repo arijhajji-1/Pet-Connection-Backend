@@ -13,6 +13,7 @@ const { validateToken } = require('../JWT/JWT');
 
 router.post("/addProduct",validateToken,productController.addProduct);
 router.get("/getAll",validateToken,productController.getAllproducts);
+router.delete("/delete/:id",validateToken,productController.deleteproduct)
 
 /*router.get("/getAll", productController.getAllProducts);
 router.get("/getAllF", productController.getAll);

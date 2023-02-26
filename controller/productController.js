@@ -48,8 +48,6 @@ exports.addProduct = async  (req, res) => {
     req.userId = decodedToken.id;
 const user = await User.findById(req.userId );
 
-
-
   const newProduct = new Product({
     name: req.body.name,
     desc: req.body.desc,
@@ -65,6 +63,38 @@ res.status(200).json(savedProduct)
         res.status(500).json(err);
     }
 
+}
+exports.deleteproduct = async  (req, res) => {
+  try{
+  //get user 
+  const accessToken = req.cookies["access-token"];
+
+  if (!accessToken) {
+    return res.status(401).json({ message: "Access token not found" });
+  }
+ 
+    const decodedToken = verify(accessToken, "azjdn1dkd3ad");
+     
+    req.userId = decodedToken.id;
+
+    const user = await User.findById(req.userId );
+  // Find the pet to be removed
+  const product = await Product.findById(req.params.id);
+  if (!product) {
+      return res.status(404).json({ error: 'product not found' });
+    }
+  // Remove the pet from the database
+  await product.remove();
+
+  // Save the user to update the pets array
+  await user.save();
+  res.json({ message: 'product deleted successfully' });
+
+}
+catch (error) {
+  console.error(error);
+  res.status(500).json({ error: 'Server error' });
+}
 }
 
 
