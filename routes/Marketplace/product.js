@@ -10,22 +10,36 @@ router.use(express.json())
 router.use(cookieParser())
 
 const { validateToken } = require('../JWT/JWT'); 
+const multer = require("multer");
 
-router.post("/addProduct",validateToken,productController.addProduct);
-router.get("/getAllU",validateToken,productController.getAllproducts);
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/uploads");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
+router.post("/addProduct",validateToken,upload.array("img"),productController.addProduct);
 router.delete("/delete/:id",validateToken,productController.deleteproduct)
 router.get("/getAllF", productController.getAll);
 router.get("/getProduct/:id", productController.getProductById);
 router.put("/update/:id",validateToken, productController.updateProduct);
-router.delete("/deletee/:id", productController.deleteProduct);
+router.delete("/deletee/:id",validateToken,productController.deleteProduct)
 
 
-/*
-router.get("/getAll", productController.getAllProducts);
+/*router.delete("/deletes/:id", async function(req,res){
+  try{
+      await Product.findByIdAndRemove(req.params.productId)
+      res.send("Deleted");
+  }catch(err){
+      res.send(err)
+  }
+})
 
-router.post("/add", productController.addNewProduct);
-router.put("/update/:id", productController.updateProduct);
-router.delete("/delete/:id", productController.deleteProduct);*/
+*/
 const { sign, verify } = require('jsonwebtoken')
 
 

@@ -1,3 +1,4 @@
+const express=require('express');
 const Product = require("../models/product")
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
@@ -8,31 +9,7 @@ const { sign, verify } = require('jsonwebtoken')
 
 
 
-// Get All only with user 
-exports.getAllproducts = async  (req, res) => {
-  try {
-    
-      const accessToken = req.cookies["access-token"];
 
-      if (!accessToken) {
-        return res.status(401).json({ message: "Access token not found" });
-      }
-     
-        const decodedToken = verify(accessToken, "azjdn1dkd3ad");
-         
-        req.userId = decodedToken.id;
-  
-        const user = await User.findById(req.userId );
-   
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    const data = await Product.find({});
-    res.send(data);
-  } catch (error) {
-    console.log(error);
-  }
-}
 
 //find avec category :http://localhost:3000/getAllF?category=aaa
 //new=true w ta3tini 1 puisque limit(1):http://localhost:3000/getAllF?new=true
@@ -84,6 +61,8 @@ const user = await User.findById(req.userId );
     name: req.body.name,
     desc: req.body.desc,
     img: req.body.img,
+    img: req.files.map((file) => file.filename),
+
     categories: req.body.categories,
     price: req.body.price,
     user: user,
@@ -95,14 +74,7 @@ res.status(200).json(savedProduct)
         res.status(500).json(err);
     }
 }
-exports.deleteProduct = async (req, res) => {
-  try {
-    await Product.findByIdAndRemove(req.params.Productid);
-    res.status(200).json("Product Deleted")
-  } catch (error) {
-    res.status(500).json(error);
-  }
-}
+
 
 exports.updateProduct = async (req, res) => {
   const accessToken = req.cookies["access-token"];
@@ -124,6 +96,15 @@ const user = await User.findById(req.userId );
   }
 }
 
+exports.deleteProduct = async (req, res) => {
+  try {
+    await Product.findByIdAndRemove(req.params.productId);
+    console.log(Product)
+    res.send("Product Deleted")
+  } catch (error) {
+    console.log(error);
+  }
+}
  
 //habtch t5dm baad ma knt t5dm
 exports.deleteproduct = async  (req, res) => {
@@ -138,18 +119,20 @@ exports.deleteproduct = async  (req, res) => {
     const decodedToken = verify(accessToken, "azjdn1dkd3ad");
      
     req.userId = decodedToken.id;
-
-    const user = await User.findById(req.userId );
+    const user =  User.findById(req.userId );
+    console.log(user);
   // Find the pet to be removed
-  const product = await Product.findById(req.params.productId);
-  if (!product) {
+  const testProduct =  Product.findById(req.params.productId);
+  console.log(testProduct)
+ 
+  if (!testProduct) {
+    
       return res.status(404).json({ error: 'product not found' });
     }
   // Remove the pet from the database
-  await product.remove();
-
+   testProduct.remove();
   // Save the user to update the pets array
-  await user.save();
+   user.save();
   res.json({ message: 'product deleted successfully' });
 
 }
