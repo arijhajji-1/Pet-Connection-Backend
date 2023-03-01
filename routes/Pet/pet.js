@@ -26,6 +26,7 @@ router.post("/addpet",validateToken,controller.addPet);
 router.post("/addpetwithUser",validateToken,upload.array("images"),controller.addPetwithUser);
 router.get('/AllpetsByUser',validateToken,controller.getAllpets);
 router.delete('/deletepet/:petId',validateToken,controller.deletepet);
+router.put('/updatepet/:id',validateToken,controller.updatePetwithUser);
 const { sign, verify } = require('jsonwebtoken')
 /*
 //get user id from token 
