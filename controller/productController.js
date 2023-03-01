@@ -96,20 +96,21 @@ const user = await User.findById(req.userId );
   }
 }
 
-exports.deleteProduct = async (req, res) => {
-  try {
-    await Product.findByIdAndRemove(req.params.productId);
-    console.log(Product)
-    res.send("Product Deleted")
-  } catch (error) {
-    console.log(error);
-  }
+exports.deleteProducts = async (req, res) => {
+    console.log(req.params.id);
+
+    // const prod = Product.findById(req.params.productId)
+    //console.log(prod.name);
+    Product.findByIdAndDelete({_id:req.params.id}).then(()=>{
+      res.send("Product Deleted")
+
+    }).catch((e)=>{console.log(e)});
+
 }
  
 //habtch t5dm baad ma knt t5dm
 exports.deleteproduct = async  (req, res) => {
   try{
-  //get user 
   const accessToken = req.cookies["access-token"];
 
   if (!accessToken) {
@@ -120,22 +121,13 @@ exports.deleteproduct = async  (req, res) => {
      
     req.userId = decodedToken.id;
     const user =  User.findById(req.userId );
-    console.log(user);
-  // Find the pet to be removed
-  const testProduct =  Product.findById(req.params.productId);
-  console.log(testProduct)
- 
-  if (!testProduct) {
-    
-      return res.status(404).json({ error: 'product not found' });
-    }
-  // Remove the pet from the database
-   testProduct.remove();
-  // Save the user to update the pets array
-   user.save();
-  res.json({ message: 'product deleted successfully' });
+    console.log(req.userId);
+    user.products.findByIdAndDelete({_id:req.params.id}).then(()=>{
+      res.send("Product Deleted")
+  
+    }).catch((e)=>{console.log(e)});
+  }
 
-}
 catch (error) {
   console.error(error);
   res.status(500).json({ error: 'Server error' });

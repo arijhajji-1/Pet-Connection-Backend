@@ -27,7 +27,7 @@ router.delete("/delete/:id",validateToken,productController.deleteproduct)
 router.get("/getAllF", productController.getAll);
 router.get("/getProduct/:id", productController.getProductById);
 router.put("/update/:id",validateToken, productController.updateProduct);
-router.delete("/deletee/:id",validateToken,productController.deleteProduct)
+router.delete("/deletee/:id",productController.deleteProducts)
 
 
 /*router.delete("/deletes/:id", async function(req,res){

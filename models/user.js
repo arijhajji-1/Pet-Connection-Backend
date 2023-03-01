@@ -15,7 +15,7 @@ var User = new schema({
       products: [
         {
           type: schema.Types.ObjectId,
-          ref: 'Pet'
+          ref: 'Product'
         }
       ]
 }); 
