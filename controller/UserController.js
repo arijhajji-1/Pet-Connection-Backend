@@ -136,7 +136,6 @@ const banUser = async (req, res) => {
     try {
         connectedUserId = getConnectedUserId(req); 
         Connected = await User.findById(connectedUserId); 
-        
         if (Connected["role"] == "admin") {
             User.findByIdAndUpdate(req.params.id, { active: false });
             res.send("User banned!")
