@@ -2,17 +2,45 @@ const User = require('../models/user')
 const express = require('express')
 const { createToken, validateToken } = require('../midill/JWT/JWT'); 
 const bcrypt = require("bcrypt"); 
+const { sign, verify } = require('jsonwebtoken')
 
 
 
+
+// =============== LOGINED USER =========================
+
+
+const getConnectedUserId = (req) => {
+    // get User
+    const accessToken = req.cookies["access-token"];
+    if (!accessToken) {
+        return res.status(401).json({ message: "Access token not found" });
+    }
+    const decodedToken = verify(accessToken, "azjdn1dkd3ad");
+    req.userId = decodedToken.id;
+    
+    return req.userId; 
+    //const user = await User.findById(req.userId);
+    //res.send(user)
+}
+
+
+
+// =============== APIs ===========================
 
 const register = (req, res) => {
-    const { username, password } = req.body; 
+    const { username, password, name, email, image, role, location, phone } = req.body; 
 
     bcrypt.hash(password, 10).then((hash) => {
         User.create({
             username: username,
-            password : hash
+            password: hash,
+            name: name,
+            email: email,
+            image: image,
+            role: role,
+            location: location,
+            phone : phone
         }).then(() => {
             res.json("USER REGISTERED"); 
         }).catch((err) => {
@@ -45,7 +73,7 @@ const login = async (req, res) => {
     })
 }
 
-const getAll = (req, res, next) => {
+const getAll = async (req, res, next) => {
     try {
         User.find({}).then(result => {
             res.send(result)
@@ -56,7 +84,7 @@ const getAll = (req, res, next) => {
 }
 
 const profile = async (req, res) => {
-    try {
+    try { 
         await User.findById(req.params.id).then(result => {
             res.send(result)
         }) 
@@ -65,11 +93,20 @@ const profile = async (req, res) => {
     }
 }
 
+
+
 const update = async (req, res) => {
     try {
-        await User.findByIdAndUpdate(req.params.id, req.body).then(result => {
-            res.send("User updated!")
-        }) 
+        
+        connectedUserId = getConnectedUserId(req);  
+
+        if (connectedUserId == req.body["_id"]) { 
+            await User.findByIdAndUpdate(connectedUserId, req.body).then(result => {
+                res.send("User updated!")
+            })     
+        } else { 
+            res.send("You can't update another user.")
+        }
     } catch (err) {
         res.send(err)
     }
@@ -77,12 +114,20 @@ const update = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        await User.findByIdAndRemove
+        connectedUserId = getConnectedUserId(req); 
+        Connected = await User.findById(connectedUserId); 
+        
+        if (Connected.role == "admin") {
+            await User.findByIdAndRemove(req.params.id)
+            res.send("User deleted!")
+        } else {
+            res.send("You must be an admin to delete another users!")
+        }
+
     } catch (err) {
         res.send(err)
     }
 }
 
 
-
-module.exports = { register, login, profile, getAll, update }
+module.exports = { register, login, profile, getAll, update, deleteUser }

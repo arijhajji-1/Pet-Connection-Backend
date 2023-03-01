@@ -10,6 +10,32 @@ var User = new schema({
     password: {
         type: String,
         required: true 
+    },
+    name: {
+        type: String,
+        required : true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique : true
+    },
+    role: {
+        type: String,
+        required : true
+    },
+    phone: {
+        type: String,
+        required : true
+    },
+    image: {
+        type: String,
+        required : true
+    },
+    location: {
+        type: String,
+        required : true
     }
+
 }); 
 module.exports = mongo.model("user", User)

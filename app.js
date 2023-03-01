@@ -6,14 +6,19 @@ const bodyParser = require("body-parser")
 
 
 // =========== Database Connection ==============
-mongo.connect(mongoconnection.url, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-}).then(() => {
-    console.log("DataBase Connected");
-}).catch((err) => {
+mongo.connect("mongodb+srv://yosramekaoui:yosra@cluster0.aalwf4q.mongodb.net/ace?retryWrites=true&w=majority"
+).then(()=>console.log("Db Connect")).catch((err)=>{
     console.log(err);
 });
+
+// mongo.connect(mongoconnection.url, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+// }).then(() => {
+//     console.log("DataBase Connected");
+// }).catch((err) => {
+//     console.log(err);
+// });
 
 
 // ============= configuration express ================
