@@ -8,7 +8,7 @@ router.use(cookieParser())
 
 
 const { createToken, validateToken } = require('../../midill/JWT/JWT'); 
-const { register, login, profile, getAll, update, deleteUser } = require("../../controller/UserController")
+const { register, login, profile, getAll, update, deleteUser, banUser } = require("../../controller/UserController")
 
  // ========== routes
 
@@ -22,8 +22,12 @@ router.put("/update/:id", validateToken, update)
 
 router.delete("/delete/:id", validateToken, deleteUser)
 
-// =========== token validation ============
-
 router.get("/profile/:id", validateToken, profile )
  
+router.get("/ban/:id", validateToken, banUser)
+
+
+
+
+
 module.exports = router; 

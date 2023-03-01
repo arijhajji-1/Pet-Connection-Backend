@@ -38,9 +38,11 @@ const register = (req, res) => {
             name: name,
             email: email,
             image: image,
-            role: role,
+            role: "simple",
             location: location,
-            phone : phone
+            phone: phone,
+            createdAt: new Date(),
+            active : true
         }).then(() => {
             res.json("USER REGISTERED"); 
         }).catch((err) => {
@@ -130,4 +132,23 @@ const deleteUser = async (req, res) => {
 }
 
 
-module.exports = { register, login, profile, getAll, update, deleteUser }
+const banUser = async (req, res) => {
+    try {
+        connectedUserId = getConnectedUserId(req); 
+        Connected = await User.findById(connectedUserId); 
+        
+        if (Connected["role"] == "admin") {
+            User.findByIdAndUpdate(req.params.id, { active: false });
+            res.send("User banned!")
+        } else {
+            res.send("You must be an admin to ban a user."); 
+        }
+    } catch (err) {
+        res.send(err)
+    }
+}
+
+
+
+
+module.exports = { register, login, profile, getAll, update, deleteUser, banUser }

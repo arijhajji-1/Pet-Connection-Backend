@@ -35,6 +35,12 @@ var User = new schema({
     location: {
         type: String,
         required : true
+    },
+    createdAt: {
+        type: Date
+    },
+    active: {
+        type : Boolean
     }
 
 }); 
