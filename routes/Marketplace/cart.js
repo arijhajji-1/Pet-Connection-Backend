@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser")
 router.use(express.json())
 router.use(cookieParser())
 
+
 const { validateToken } = require('../../midill/JWT/JWT')
 
 router.post("/addCart",validateToken,cartController.addCart);
