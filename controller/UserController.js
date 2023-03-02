@@ -44,7 +44,8 @@ const register = (req, res) => {
             createdAt: new Date(),
             active : true
         }).then(() => {
-            res.json("USER REGISTERED"); 
+            res.json("USER REGISTERED");
+            
         }).catch((err) => {
             if (err) {
                 res.status(400).json({error : err})
@@ -69,7 +70,9 @@ const login = async (req, res) => {
             res.cookie("access-token", accessToken, {
                 maxAge : 60*60*24*30*1000 
             }) // cookie expires after 30 days
-            res.json("USER LOGGINED"); 
+
+            req.session.user = user; 
+            res.json(req.session.user); 
 
         }
     })
@@ -100,13 +103,13 @@ const profile = async (req, res) => {
 const update = async (req, res) => {
     try {
         
-        connectedUserId = getConnectedUserId(req);  
+        connectedUserId = getConnectedUserId(req);
 
-        if (connectedUserId == req.body["_id"]) { 
+        if (connectedUserId == req.body["_id"]) {
             await User.findByIdAndUpdate(connectedUserId, req.body).then(result => {
                 res.send("User updated!")
-            })     
-        } else { 
+            })
+        } else {
             res.send("You can't update another user.")
         }
     } catch (err) {
@@ -147,7 +150,18 @@ const banUser = async (req, res) => {
     }
 }
 
+const logout = () => async (req, res) => {
+  await req.session.destroy((err) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send('An error occurred while logging out');
+    } else {
+      res.send('Logged out successfully');
+    }
+  });
+}
 
 
 
-module.exports = { register, login, profile, getAll, update, deleteUser, banUser }
+
+module.exports = { register, login, profile, getAll, update, deleteUser, banUser, logout }

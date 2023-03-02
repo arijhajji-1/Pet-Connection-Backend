@@ -25,16 +25,13 @@ var User = new schema({
         required : true
     },
     phone: {
-        type: String,
-        required : true
+        type: String
     },
     image: {
-        type: String,
-        required : true
+        type: String
     },
     location: {
-        type: String,
-        required : true
+        type: String 
     },
     createdAt: {
         type: Date
