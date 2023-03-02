@@ -59,23 +59,25 @@ const login = async (req, res) => {
     const user = await User.findOne({ username: username }); 
 
     if (!user) res.status(400).json({ error: "User doesn't exist" })
-    const dbPassword = user.password
-    bcrypt.compare(password, dbPassword).then((match) => {
-        if (!match) {
-            res.status(400).json({
-                error : "Wrong username and password combination"
-            })
-        } else {
-            const accessToken = createToken(user); 
-            res.cookie("access-token", accessToken, {
-                maxAge : 60*60*24*30*1000 
-            }) // cookie expires after 30 days
+    else {
+        const dbPassword = user.password
+        bcrypt.compare(password, dbPassword).then((match) => {
+            if (!match) {
+                res.status(400).json({
+                    error: "Wrong username and password combination"
+                })
+            } else {
+                const accessToken = createToken(user);
+                res.cookie("access-token", accessToken, {
+                    maxAge: 60 * 60 * 24 * 30 * 1000
+                }) // cookie expires after 30 days
 
-            req.session.user = user; 
-            res.json(req.session.user); 
-
-        }
-    })
+                req.session.user = user; 
+                res.json(req.session.user);
+                //res.send(user)
+            }
+        })
+    }
 }
 
 const getAll = async (req, res, next) => {
