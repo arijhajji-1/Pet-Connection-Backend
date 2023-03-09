@@ -89,7 +89,7 @@ const getAll = async (req, res, next) => {
         console.log(err)
     } //kk
 }
-conso 
+co  
 const profile = async (req, res) => {
     try { 
         await User.findById(req.params.id).then(result => {
