@@ -87,9 +87,9 @@ const getAll = async (req, res, next) => {
         })
     } catch (err) {
         console.log(err)
-    }
+    } //kk
 }
-
+console!;
 const profile = async (req, res) => {
     try { 
         await User.findById(req.params.id).then(result => {
