@@ -87,7 +87,7 @@ const getAll = async (req, res, next) => {
         })
     } catch (err) {
         console.log(err)
-    } //kk
+    }  
 }
 const profile = async (req, res) => {
     try { 
