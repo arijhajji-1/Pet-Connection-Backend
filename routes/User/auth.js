@@ -25,7 +25,7 @@ router.get("/google", passport.authenticate("google", ["profile", "email"]));
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    successRedirect: process.env.CLIENT_URL,
+    successRedirect: "/home",
     failureRedirect: "/login/failed",
   })
 );

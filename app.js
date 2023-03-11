@@ -11,7 +11,7 @@ require("dotenv").config();
 const passport = require("passport"); 
 const cookieSession = require("cookie-session"); 
 const passportSetup = require("./routes/User/passport"); 
-const authRoute = require("./routes/auth");
+const authRoute = require("./routes/User/auth");
 
 
 // =========== Database Connection ==============
