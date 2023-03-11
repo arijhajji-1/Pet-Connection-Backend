@@ -10,7 +10,7 @@ const session = require('express-session');
 require("dotenv").config(); 
 const passport = require("passport"); 
 const cookieSession = require("cookie-session"); 
-
+const passportSetup = require("./routes/User/passport"); 
 
 
 // =========== Database Connection ==============
