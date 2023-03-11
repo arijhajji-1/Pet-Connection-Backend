@@ -11,6 +11,7 @@ require("dotenv").config();
 const passport = require("passport"); 
 const cookieSession = require("cookie-session"); 
 const passportSetup = require("./routes/User/passport"); 
+const authRoute = require("./routes/auth");
 
 
 // =========== Database Connection ==============
@@ -60,7 +61,7 @@ app.use(
 
 app.use(passport.initialize()); 
 app.use(passport.session()); 
-
+app.use("/auth", authRoute); 
 
  
 
