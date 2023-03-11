@@ -6,6 +6,13 @@ const bodyParser = require("body-parser");
 const cors = require('cors');
 const session = require('express-session');
 
+// ====== google auth =============
+require("dotenv").config(); 
+const passport = require("passport"); 
+const cookieSession = require("cookie-session"); 
+
+
+
 // =========== Database Connection ==============
 mongo.connect("mongodb+srv://yosramekaoui:yosra@cluster0.aalwf4q.mongodb.net/ace?retryWrites=true&w=majority"
 ).then(()=>console.log("Db Connect")).catch((err)=>{
@@ -42,6 +49,17 @@ app.use('/user', useRouter);
 
 
 
+// =============== google auth ======= 
+app.use(
+  cookieSession({
+    name: "session",
+    keys: ["cyberwolve"],
+    maxAge : 24*60*60*100
+  })
+)
+
+app.use(passport.initialize()); 
+app.use(passport.session()); 
 
 
  
