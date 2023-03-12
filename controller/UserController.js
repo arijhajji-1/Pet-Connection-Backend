@@ -6,6 +6,7 @@ const { createToken, validateToken } = require('../midill/JWT/JWT');
 const bcrypt = require("bcrypt"); 
 const { sign, verify } = require('jsonwebtoken')
 require('dotenv').config();
+const mongoose = require('mongoose'); 
 
 const fetch = require('node-fetch');
 const user = require('../models/user');
@@ -177,40 +178,47 @@ const logout = () => async (req, res) => {
    
 
 
-  const twofactorverification = async (req, res) => {
-    try {
-      const user = await User.findById(req.params.id);
-  console.log(user)
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-  
-      const token = req.body.token;
-  
-      const verified = speakeasy.totp.verify({
-        secret: user.twoFactorSecret,
-        encoding: "base32",
-        token: token,
-        window: 2,
-      });
-  
-      if (!verified) {
-        return res.status(400).json({ message: "Invalid OTP token" });
-      }
-  
-      // Mark user as verified
-      user.twoFactorVerified = true;
-      await user.save();
-  
-      return res.json({ message: "Two-factor authentication has been verified" });
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json({ message: "Internal server error" });
+const twofactorverification = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    console.log("User:", user);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-  };
+
+    const token = req.body.token;
+    console.log("Token:", token);
+
+    const verified = speakeasy.totp.verify({
+      secret: user.secret, // Use the user's secret here
+      encoding: "base32",
+      token: token,
+      window: 2,
+    });
+    console.log("Verified:", verified);
+
+    if (!verified) {
+      return res.status(400).json({ message: "Invalid OTP token" });
+    }
+
+    // Mark user as verified
+    user.twoFactorVerified = true;
+    await user.save();
+    console.log("User saved:", user);
+
+    return res.json({ message: "Two-factor authentication has been verified" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+
   
   // Enable two-factor authentication
-const enableTwoFactor = async (req, res) => {
+  const enableTwoFactor = async (req, res) => {
     try {
       const user = await User.findById(req.params.id);
   
@@ -219,11 +227,10 @@ const enableTwoFactor = async (req, res) => {
       }
   
       const secret = speakeasy.generateSecret({ length: 20 });
-      await User.findByIdAndUpdate(req.params.id, { secret: secret.base32, twoFactorEnabled: true });
-     
-      await user.save();
+      await user.updateOne({ secret: secret.base32, twoFactorEnabled: true });
   
-      const otpAuthUrl = `otpauth://totp/${user.username}?secret=${secret.base32}&issuer=My%20App`;
+  
+      const otpAuthUrl = `otpauth://totp/${user.username}?secret=${secret.base32}&issuer=PetConnection`;
       const qrCode = await qrcode.toDataURL(otpAuthUrl);
   
       res.json({
@@ -236,6 +243,7 @@ const enableTwoFactor = async (req, res) => {
     }
   };
   
+  
   // Disable two-factor authentication
   const disableTwoFactor = async (req, res) => {
     try {
@@ -244,9 +252,11 @@ const enableTwoFactor = async (req, res) => {
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      await User.findByIdAndUpdate(req.params.id, { secret: null, twoFactorEnabled: false ,twoFactorVerified: false});
-
-    
+  
+      user.secret = null;
+      user.twoFactorEnabled = false;
+      user.twoFactorVerified = false;
+  
       await user.save();
   
       res.json({ message: "Two-factor authentication has been disabled" });
@@ -258,7 +268,7 @@ const enableTwoFactor = async (req, res) => {
   
 
   const facebooklogin = async (req, res) => {
-    const { facebookId, name, email, image,username,
+    const {userId, facebookId, name, email, image,username,
       password,
       role } = req.body;
   
@@ -269,6 +279,7 @@ const enableTwoFactor = async (req, res) => {
         console.log('User already exists:', user);
       } else {
         user = new User({
+          userId,
           facebookId,
           name,
           email,
