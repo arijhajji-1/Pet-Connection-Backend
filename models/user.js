@@ -11,12 +11,34 @@ var User = new schema({
         type: String,
         required: true 
     },
-    //relation pet user 
-    pets: [
-        {
-          type: schema.Types.ObjectId,
-          ref: 'Pet'
-        }
-      ]
+    name: {
+        type: String,
+        required : true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique : true
+    },
+    role: {
+        type: String,
+        required : true
+    },
+    phone: {
+        type: String
+    },
+    image: {
+        type: String
+    },
+    location: {
+        type: String 
+    },
+    createdAt: {
+        type: Date
+    },
+    active: {
+        type : Boolean
+    }
+
 }); 
 module.exports = mongo.model("user", User)
