@@ -180,8 +180,12 @@ const logout = () => async (req, res) => {
 
 const twofactorverification = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    console.log("User:", user);
+    let user;
+    if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+      user = await User.findById(req.params.id);
+    } else {
+      user = await User.findOne({ facebookId: req.params.id });
+    }
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -220,7 +224,12 @@ const twofactorverification = async (req, res) => {
   // Enable two-factor authentication
   const enableTwoFactor = async (req, res) => {
     try {
-      const user = await User.findById(req.params.id);
+      let user;
+      if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+        user = await User.findById(req.params.id);
+      } else {
+        user = await User.findOne({ facebookId: req.params.id });
+      }
   
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -228,7 +237,6 @@ const twofactorverification = async (req, res) => {
   
       const secret = speakeasy.generateSecret({ length: 20 });
       await user.updateOne({ secret: secret.base32, twoFactorEnabled: true });
-  
   
       const otpAuthUrl = `otpauth://totp/${user.username}?secret=${secret.base32}&issuer=PetConnection`;
       const qrCode = await qrcode.toDataURL(otpAuthUrl);
@@ -244,10 +252,17 @@ const twofactorverification = async (req, res) => {
   };
   
   
+  
+  
   // Disable two-factor authentication
   const disableTwoFactor = async (req, res) => {
     try {
-      const user = await User.findById(req.params.id);
+      let user;
+      if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+        user = await User.findById(req.params.id);
+      } else {
+        user = await User.findOne({ facebookId: req.params.id });
+      }
   
       if (!user) {
         return res.status(404).json({ message: "User not found" });
