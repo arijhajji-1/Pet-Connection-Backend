@@ -38,6 +38,9 @@ var User = new schema({
     },
     active: {
         type : Boolean
+    },
+    google: {
+        type : Boolean
     }
 
 }); 

@@ -28,6 +28,8 @@ router.get("/ban/:id", validateToken, banUser)
 
 router.post('/logout', validateToken, logout);
 
+router.post("/loginGoogle", loginGoogle);
+
 
 
 module.exports = router; 

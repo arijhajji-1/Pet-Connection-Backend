@@ -165,4 +165,29 @@ const logout = () => async (req, res) => {
 
 
 
-module.exports = { register, login, profile, getAll, update, deleteUser, banUser, logout }
+
+
+const loginGoogle = async (req, res) => {
+  const { username, email, google } = req.body;
+  const user = await User.findOne({ username: username });
+
+    if (google == true) {
+        if (!user) res.status(400).json({ error: "User doesn't exist" });
+        else {
+          const accessToken = createToken(user);
+          res.cookie("access-token", accessToken, {
+            maxAge: 60 * 60 * 24 * 30 * 1000,
+          });
+          req.session.user = user;
+          res.json(req.session.user);
+        }
+        
+    }  
+  
+};
+
+
+
+
+
+module.exports = { register, login, profile, getAll, update, deleteUser, banUser, logout, loginGoogle }
