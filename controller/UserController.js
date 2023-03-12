@@ -42,7 +42,8 @@ const register = (req, res) => {
             location: location,
             phone: phone,
             createdAt: new Date(),
-            active : true
+            active: true,
+            google : false
         }).then(() => {
             res.json("USER REGISTERED");
             
@@ -59,7 +60,7 @@ const login = async (req, res) => {
     const user = await User.findOne({ username: username }); 
 
     if (!user) res.status(400).json({ error: "User doesn't exist" })
-    else {
+    else if (user.active == true ) {
         const dbPassword = user.password
         bcrypt.compare(password, dbPassword).then((match) => {
             if (!match) {
@@ -77,6 +78,8 @@ const login = async (req, res) => {
                 //res.send(user)
             }
         })
+    } else {
+        res.json({ban : true}); 
     }
 }
 
@@ -141,7 +144,7 @@ const banUser = async (req, res) => {
         connectedUserId = getConnectedUserId(req); 
         Connected = await User.findById(connectedUserId); 
         if (Connected["role"] == "admin") {
-            User.findByIdAndUpdate(req.params.id, { active: false });
+            await User.findByIdAndUpdate(req.params.id, { active: false });
             res.send("User banned!")
         } else {
             res.send("You must be an admin to ban a user."); 
@@ -210,7 +213,20 @@ const loginGoogle = async (req, res) => {
 };
 
 
+// ======== promote user to admin
+const promoteUser = async (req, res) => {
+  try {
+     
+    const user = await User.findByIdAndUpdate(req.params.id, { role: "admin" });
+    res.send(user); 
+    //res.send("User promoted!");
+     
+  } catch (err) {
+    res.send(err);
+  }
+};
 
 
 
-module.exports = { register, login, profile, getAll, update, deleteUser, banUser, logout, loginGoogle }
+
+module.exports = { register, login, profile, getAll, update, deleteUser, banUser, logout, loginGoogle, promoteUser }
