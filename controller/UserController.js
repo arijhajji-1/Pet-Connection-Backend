@@ -165,23 +165,46 @@ const logout = () => async (req, res) => {
 
 
 
-
+// ====== google ==========
 
 const loginGoogle = async (req, res) => {
-  const { username, email, google } = req.body;
-  const user = await User.findOne({ username: username });
+  const { username, name, image, email, google } = req.body;
+  const user = await User.findOne({ email: email });
 
     if (google == true) {
-        if (!user) res.status(400).json({ error: "User doesn't exist" });
-        else {
-          const accessToken = createToken(user);
-          res.cookie("access-token", accessToken, {
-            maxAge: 60 * 60 * 24 * 30 * 1000,
-          });
-          req.session.user = user;
-          res.json(req.session.user);
+        if (!user){
+            
+            User.create({
+              username: username,
+              password: "azdadkAZOP",
+              name: name,
+              email: email,
+              image: image,
+              role: "simple",
+              location: "",
+              phone: null,
+              createdAt: new Date(),
+              active: true,
+              google : google
+            })
+            .then(() => {
+                res.json("USER REGISTERED");
+            })
+            .catch((err) => {
+            if (err) {
+                res.status(400).json({ error: err });
+            }
+            });
+
+        } else {
+            
+            const accessToken = createToken(user);
+            res.cookie("access-token", accessToken, {
+                maxAge: 60 * 60 * 24 * 30 * 1000,
+            });
+            req.session.user = user;
+            res.json(req.session.user);
         }
-        
     }  
   
 };
