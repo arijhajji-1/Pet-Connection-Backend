@@ -38,7 +38,23 @@ var User = new schema({
     },
     active: {
         type : Boolean
-    }
+    },
+    secret: {
+        type: String,
+        
+      },
+      twoFactorEnabled: {
+        type: Boolean,
+        default: false
+      },
+      twoFactorVerified:
+        {
+            type: Boolean,
+            default: false
+        },
+     facebookId: String,
+     
+
 
 }); 
 module.exports = mongo.model("user", User)
