@@ -8,7 +8,7 @@ router.use(cookieParser())
 
 
 const { createToken, validateToken } = require('../../midill/JWT/JWT'); 
-const { register, login, profile, getAll, update, deleteUser, banUser, logout } = require("../../controller/UserController")
+const { register, login, profile, getAll, update, deleteUser, banUser, logout, addUser, updateUser } = require("../../controller/UserController")
 
  // ========== routes
 
@@ -18,16 +18,19 @@ router.post("/login", login )
 
 router.get("/all", getAll )
 
-router.put("/update/:id", validateToken, update)
 
-router.delete("/delete/:id", validateToken, deleteUser)
+
+
 
 router.get("/profile/:id", validateToken, profile )
  
-router.get("/ban/:id", validateToken, banUser)
+
 
 router.post('/logout', validateToken, logout);
+// you have to add validateToken 
 
-
-
+router.post('/add',addUser);
+router.delete("/delete/:id", deleteUser)
+router.post("/ban/:id", banUser);
+router.put("/update/:id", updateUser)
 module.exports = router; 

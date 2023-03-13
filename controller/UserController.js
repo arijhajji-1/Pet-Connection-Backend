@@ -116,7 +116,7 @@ const profile = async (req, res) => {
     }
 }
 
-
+/*
 
 const update = async (req, res) => {
     try {
@@ -133,26 +133,27 @@ const update = async (req, res) => {
     } catch (err) {
         res.send(err)
     }
-}
-
+}*/
+/*
 const deleteUser = async (req, res) => {
     try {
-        connectedUserId = getConnectedUserId(req); 
-        Connected = await User.findById(connectedUserId); 
+        // connectedUserId = getConnectedUserId(req); 
+        // Connected = await User.findById(connectedUserId); 
         
         if (Connected.role == "admin") {
             await User.findByIdAndRemove(req.params.id)
             res.send("User deleted!")
         } else {
+            console.log("kkkkkkkkk")
             res.send("You must be an admin to delete another users!")
         }
 
     } catch (err) {
         res.send(err)
     }
-}
+}*/
 
-
+/*
 const banUser = async (req, res) => {
     try {
         connectedUserId = getConnectedUserId(req); 
@@ -167,7 +168,7 @@ const banUser = async (req, res) => {
         res.send(err)
     }
 }
-
+*/
 const logout = () => async (req, res) => {
   await req.session.destroy((err) => {
     if (err) {
@@ -179,7 +180,106 @@ const logout = () => async (req, res) => {
   });
 }
 
+// admin add user 
+
+const addUser = async (req, res) => {
+    try {
+        const { username, password, name, email, image, role, location, phone } = req.body;
+
+        const hash = await bcrypt.hash(password, 10);
+
+        await User.create({
+            username: username,
+            password: hash,
+            name: name,
+            email: email,
+            image: image,
+            role: role || "simple",
+            location: location,
+            phone: phone,
+            createdAt: new Date(),
+            active : true
+        });
+
+        res.json("USER REGISTERED");
+
+    } catch (error) {
+        console.log(error);
+        res.status(400).json(error);
+    }
+}
+// admin delete user 
+const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+    
+        // Check if user exists
+        const user = await User.findById(id);
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+    
+        // Delete user
+        await User.findByIdAndRemove(id);
+    
+        res.json({ message: "User deleted" });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+      }
+}
+//admin ban user
+const banUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+        if(user.active==true){
+        await User.findByIdAndUpdate(req.params.id, { active: false });
+        res.send("User banned!");   }
+        else{
+            await User.findByIdAndUpdate(req.params.id, { active: true });
+            res.send("User banned!"); 
+        }
+        
+    } catch (err) {
+        res.send(err)
+    }
+}
+//update user
+const updateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { username, password, name, email, image, role, location, phone, active } = req.body;
+
+        // Check if user exists
+        const user = await User.findById(id);
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        // Update user
+        const hash = await bcrypt.hash(password, 10);
+        user.username = username;
+        user.password = hash;
+        user.name = name;
+        user.email = email;
+        user.image = image;
+        user.role = role || "simple";
+        user.location = location;
+        user.phone = phone;
+        user.active = active;
+
+        await user.save();
+
+        res.json({ message: "User updated", user: user });
+
+    } catch (error) {
+        console.log(error);
+        res.status(400).json(error);
+    }
+}
 
 
-
-module.exports = { register, login, profile, getAll, update, deleteUser, banUser, logout }
+module.exports = { register, login, profile, getAll, updateUser, deleteUser, banUser, logout,addUser }
