@@ -366,5 +366,62 @@ const twofactorverification = async (req, res) => {
   //       });
   //     })
   // );
+// ====== google ==========
 
-module.exports = { register, login, profile, getAll, update, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin}
+const loginGoogle = async (req, res) => {
+  const { username, name, image, email, google } = req.body;
+  const user = await User.findOne({ email: email });
+
+    if (google == true) {
+        if (!user){
+            
+            User.create({
+              username: username,
+              password: "azdadkAZOP",
+              name: name,
+              email: email,
+              image: image,
+              role: "simple",
+              location: "",
+              phone: null,
+              createdAt: new Date(),
+              active: true,
+              google : google
+            })
+            .then(() => {
+                res.json("USER REGISTERED");
+            })
+            .catch((err) => {
+            if (err) {
+                res.status(400).json({ error: err });
+            }
+            });
+
+        } else {
+            
+            const accessToken = createToken(user);
+            res.cookie("access-token", accessToken, {
+                maxAge: 60 * 60 * 24 * 30 * 1000,
+            });
+            req.session.user = user;
+            res.json(req.session.user);
+        }
+    }  
+  
+};
+
+
+// ======== promote user to admin
+const promoteUser = async (req, res) => {
+  try {
+     
+    const user = await User.findByIdAndUpdate(req.params.id, { role: "admin" });
+    res.send(user); 
+    //res.send("User promoted!");
+     
+  } catch (err) {
+    res.send(err);
+  }
+};
+
+module.exports = { register, login, profile, getAll, update, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin, loginGoogle, promoteUser }

@@ -53,6 +53,10 @@ var User = new schema({
             default: false
         },
      facebookId: String,
+     google: {
+        type : Boolean
+    }
+
      
 
 
