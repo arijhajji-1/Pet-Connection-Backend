@@ -8,10 +8,12 @@ router.use(cookieParser())
 
 
 const { createToken, validateToken ,authMiddleware} = require('../../midill/JWT/JWT'); 
-const { register, login, profile, getAll, update, deleteUser, banUser, logout ,forgetPasswordToken,passwordResetCtrl,updateUserPasswordCtrl} = require("../../controller/UserController")
+const { register, login, profile, verifyUser,getAll, update, deleteUser, banUser, logout ,forgetPasswordToken,passwordResetCtrl,updateUserPasswordCtrl} = require("../../controller/UserController")
  // ========== routes
 
 router.post("/register", register)
+
+router.get("/verify/:userId", verifyUser)
 
 router.post("/login", login )
 router.post("/forget-password-token", forgetPasswordToken);

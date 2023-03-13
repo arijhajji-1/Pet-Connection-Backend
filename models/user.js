@@ -11,12 +11,6 @@ var User = new schema({
     },
     password: {
         type: String,
-<<<<<<< Updated upstream
-        required: true 
-    }
-}); 
-module.exports = mongo.model("user", User)
-=======
         required: true
     },
     name: {
@@ -51,6 +45,7 @@ module.exports = mongo.model("user", User)
         type: Boolean,
 
     },
+    isUserVerified: {type: Boolean, default: false},
 });
 
 
@@ -76,15 +71,14 @@ User.methods.isPasswordMatched = async function (enteredPassword) {
 };
 
 // password crypttt
-User.pre("save", async function (next) {
-    if (!this.isModified("password")) {
-        next();
-    }
+// User.pre("save", async function (next) {
+//     if (!this.isModified("password")) {
+//         next();
+//     }
 
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    console.log("ffgfr ");
-    next();
-});
+//     const salt = await bcrypt.genSalt(10);
+//     this.password = await bcrypt.hash(this.password, salt);
+//     console.log("ffgfr ");
+//     next();
+// });
 module.exports = mongo.model("User", User)
->>>>>>> Stashed changes

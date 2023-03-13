@@ -7,17 +7,8 @@ const cors = require('cors');
 const session = require('express-session');
 
 // =========== Database Connection ==============
-<<<<<<< Updated upstream
-mongo.connect(mongoconnection.url, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-}).then(() => {
-    console.log("DataBase Connected");
-}).catch((err) => {
-=======
 mongo.connect("mongodb+srv://yosramekaoui:yosra@cluster0.aalwf4q.mongodb.net/ace?retryWrites=true&w=majority"
 ).then(()=>console.log("Db Connect")).catch((err)=>{
->>>>>>> Stashed changes
     console.log(err);
 });
 
@@ -49,10 +40,7 @@ var useRouter = require('./routes/User/user');
 app.use('/user', useRouter); 
 
 
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
 
 
 

@@ -33,6 +33,7 @@ const register = (req, res) => {
     const {username, password, name, email, image, role, location, phone} = req.body;
 
     bcrypt.hash(password, 10).then((hash) => {
+        
         User.create({
             username: username,
             password: hash,
@@ -44,9 +45,17 @@ const register = (req, res) => {
             phone: phone,
             createdAt: new Date(),
             active: true
-        }).then(() => {
-            res.json("USER REGISTERED");
-
+        }).then((user) => {
+            userId = user._id;
+            console.log(User.password)
+            const url = `${req.protocol}://${req.get("host")}/user/verify/${userId}`;
+            mailingService.sendVerificationEmail(user, url).then(()=>{
+                console.log("jaw");
+                res.json("USER REGISTERED check your email");
+            }).catch((e)=>{
+                console.log(e);
+            })
+            
         }).catch((err) => {
             if (err) {
                 res.status(400).json({error: err})
@@ -55,9 +64,23 @@ const register = (req, res) => {
     })
 }
 
+const verifyUser = async (req, res, next) => {
+    try {
+        
+        const user = await User.findById(req.params.userId);
+
+        user.isUserVerified = true;
+
+        await user.save();
+        res.status(200).json({message: 'Account verified'});
+    } catch (err) {
+        res.status(400).json({error: err.message});
+    }
+}
+
 const login = async (req, res) => {
-    const { email, password } = req.body; 
-    const user = await User.findOne({ email: email }); 
+    const { username, password } = req.body; 
+    const user = await User.findOne({ username: username }); 
 
     if (!user) res.status(400).json({ error: "User doesn't exist" })
     else {
@@ -104,8 +127,8 @@ const login = async (req, res) => {
         res.status(401);
         throw new Error("invalid email or password ");
     }
-});*/
-
+});
+*/
 const getAll = async (req, res, next) => {
     try {
         User.find({}).then(result => {
@@ -231,8 +254,9 @@ const forgetPasswordToken = async (req, res) => {
 
 const passwordResetCtrl = async (req, res) => {
     const {token, password} = req.body;
+    const pass = await bcrypt.hash(password, 10);
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-
+ console.log(hashedToken);
     //find this user by token
     const user = await User.findOne({
         passwordResetToken: hashedToken,
@@ -241,7 +265,7 @@ const passwordResetCtrl = async (req, res) => {
     if (!user) throw new Error("Token Expired, try again later");
 
     //Update/change the password
-    user.password = password;
+    user.password = pass;
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save();
@@ -287,5 +311,6 @@ module.exports = {
     logout,
     forgetPasswordToken,
     passwordResetCtrl,
-    updateUserPasswordCtrl
+    updateUserPasswordCtrl,
+    verifyUser
 }
