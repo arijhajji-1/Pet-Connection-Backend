@@ -4,7 +4,7 @@ const mongo = require('mongoose');
 const mongoconnection = require('./config/mongoconnection.json'); 
 const bodyParser = require("body-parser");
 const cors = require('cors');
-const session = require('express-session');
+const session = require('express-session')
 
 // ====== google auth =============
 // require("dotenv").config(); 
@@ -59,15 +59,16 @@ app.use('/user', useRouter);
 //   })
 // )
 
+
 // app.use(passport.initialize()); 
 // app.use(passport.session()); 
 // app.use("/auth", authRoute); 
 
  
 
-
-
-
 // ========= server creation =============
 const server = http.createServer(app); 
 server.listen(3000, () => console.log('server'))
+
+
+//================//
