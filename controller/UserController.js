@@ -18,13 +18,15 @@ const { Canvas, Image, ImageData } = require('canvas');
 const faceapi = require('face-api.js');
 const { Blob } = require('buffer');
 const axios = require('axios').default;
+const expressAsyncHandler = require("express-async-handler");
+const mailingService = require('../utils/MailingService')
 
 
 const multer = require('multer');
 const fs = require('fs');
 
 
-const cv = require('opencv-wasm');
+//const cv = require('opencv-wasm');
 
 
 
@@ -90,9 +92,17 @@ const register = (req, res) => {
                         phone: phone,
                         createdAt: new Date(),
                         active : true
-                    }).then(() => {
-                        res.json("USER REGISTERED");
+                    }).then((user) => {
+                      userId = user._id;
+                      console.log(User.password)
+                      const url = `${req.protocol}://${req.get("host")}/user/verify/${userId}`;
+                      mailingService.sendVerificationEmail(user, url).then(()=>{
+                          res.json("USER REGISTERED check your email");
                         console.log(" your token ==== ",token);
+                      }).catch((e)=>{
+                        console.log(e);
+                    })
+
                     }).catch((err) => {
                         if (err) {
                             res.status(400).json({error : err})
@@ -681,6 +691,104 @@ const getUserImage = async (req, res) => {
       res.status(500).json({ message: 'Server error' });
   }
 };
+const forgetPasswordToken = async (req, res) => {
+  //find the user by email
+  const {email} = req.body;
+console.log(email)
+  const user = await User.findOne({email});
+  //console.log(user);
+  if (!user) throw new Error("User Not Found");
 
+  try {
+      //Create token
+      const token = await user.createPasswordResetToken();
+      //console.log(token);
+      await user.save();
 
-module.exports = { register, login, profile, getAll, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin, loginGoogle, promoteUser,upload, getUserImage,updateuser,updateUser, deleteUser, banUser,addUser,banUser2}
+      //build your message
+      const resetURL = `If you were requested to reset your password, reset now within 10 minutes, otherwise ignore this message <a href="http://localhost:3001/resetpassword/${token}">Click to Reset</a>`;
+      const msg = {
+          to: email,
+          from: "yosramekaoui@gmail.com",
+          subject: "Reset Password",
+          html: resetURL,
+      };
+      console.log(msg);
+      await mailingService.sendEmail(msg.to, msg.subject, resetURL);
+      res.json({
+          msg: `A verification message is successfully sent to ${user?.email}. Reset now within 10 minutes, ${resetURL}`,
+      });
+  } catch (error) {
+      res.json({message: error});
+  }
+};
+
+//------------------------------
+//Password reset
+// http://localhost:3000/user/reset-password
+//------------------------------
+
+const passwordResetCtrl = async (req, res) => {
+  const {token, password} = req.body;
+  
+  const pass = await bcrypt.hash(password, 10);
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+console.log(hashedToken);
+  //find this user by token
+  const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: {$gt: Date.now()},
+  });
+  if (!user) throw new Error("Token Expired, try again later");
+
+  //Update/change the password
+  user.password = pass;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+  res.json(user);
+}
+//Update password  done
+
+const updateUserPasswordCtrl = expressAsyncHandler(async (req, res) => {
+  const {_id} = req.user;
+  const {newpassword, password} = req.body;
+  validateMongodbId(_id);
+
+  const user = await User.findById(_id);
+  if (await user.isPasswordMatched(password)) {
+      if (!newpassword) {
+          res.json({
+              status: "200",
+              message: "please provide the new password",
+          });
+      } else {
+          user.password = newpassword;
+          const updatedUser = await user.save();
+          res.json({
+              user: updatedUser,
+              msg: "password updated ",
+          });
+      }
+  } else {
+      res.json({
+          status: "400",
+          message: "password incorrect",
+      });
+  }
+});
+const verifyUser = async (req, res, next) => {
+  try {
+      
+      const user = await User.findById(req.params.userId);
+
+      user.isUserVerified = true;
+
+      await user.save();
+      res.status(200).json( 'Account verified');
+  } catch (err) {
+      res.status(400).json({error: err.message});
+  }
+}
+
+module.exports = { register, login, profile, getAll, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin, loginGoogle, promoteUser,upload, getUserImage,updateuser,updateUser, deleteUser, banUser,addUser,banUser2,updateUserPasswordCtrl,forgetPasswordToken,passwordResetCtrl,verifyUser}
