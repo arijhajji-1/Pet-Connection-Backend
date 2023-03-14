@@ -80,7 +80,9 @@ const verifyUser = async (req, res, next) => {
 
 const login = async (req, res) => {
     const { username, password } = req.body; 
-    const user = await User.findOne({ username: username }); 
+    const user = await User.findOne({ username: username });
+    /*const { email, password } = req.body; 
+    const user = await User.findOne({ email: email }); */
 
     if (!user) res.status(400).json({ error: "User doesn't exist" })
     else {
@@ -218,7 +220,7 @@ const logout = () => async (req, res) => {
 const forgetPasswordToken = async (req, res) => {
     //find the user by email
     const {email} = req.body;
-
+console.log(email)
     const user = await User.findOne({email});
     //console.log(user);
     if (!user) throw new Error("User Not Found");
@@ -226,11 +228,11 @@ const forgetPasswordToken = async (req, res) => {
     try {
         //Create token
         const token = await user.createPasswordResetToken();
-        console.log(token);
+        //console.log(token);
         await user.save();
 
         //build your message
-        const resetURL = `If you were requested to reset your password, reset now within 10 minutes, otherwise ignore this message <a href="http://localhost:3000/reset-password/${token}">Click to Reset</a>`;
+        const resetURL = `If you were requested to reset your password, reset now within 10 minutes, otherwise ignore this message <a href="http://localhost:3001/resetpassword/${token}">Click to Reset</a>`;
         const msg = {
             to: email,
             from: "yosramekaoui@gmail.com",
@@ -254,6 +256,7 @@ const forgetPasswordToken = async (req, res) => {
 
 const passwordResetCtrl = async (req, res) => {
     const {token, password} = req.body;
+    
     const pass = await bcrypt.hash(password, 10);
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
  console.log(hashedToken);

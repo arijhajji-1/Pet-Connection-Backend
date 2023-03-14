@@ -20,7 +20,7 @@ var User = new schema({
     email: {
         type: String,
         required: true,
-        unique: true
+       // unique: true
     },
     role: {
         type: String,

@@ -18,7 +18,7 @@ router.get("/verify/:userId", verifyUser)
 router.post("/login", login )
 router.post("/forget-password-token", forgetPasswordToken);
 // Password reset
-router.put("/reset-password", passwordResetCtrl);
+router.put("/resetpassword", passwordResetCtrl);
 
 
 router.get("/all", getAll )
