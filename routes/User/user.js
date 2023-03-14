@@ -10,7 +10,7 @@ const FacebookStrategy = require("passport-facebook").Strategy;
 const passport = require("passport");
 
 const { createToken, validateToken } = require('../../midill/JWT/JWT'); 
-const { register, login, profile, getAll, update, deleteUser, banUser, logout,twofactorverification,disableTwoFactor,enableTwoFactor,facebooklogin , loginGoogle, promoteUser } = require("../../controller/UserController")
+const { register, login, profile, getAll, updateUser, deleteUser, banUser, logout,twofactorverification,disableTwoFactor,enableTwoFactor,facebooklogin , loginGoogle, promoteUser,updateuser,getUserImage,upload } = require("../../controller/UserController")
 
  // ========== routes
  
@@ -22,7 +22,7 @@ router.post("/login", login )
 
 router.get("/all", getAll )
 
-router.put("/update/:id", validateToken, update)
+router.put("/update/:id", validateToken, updateUser)
 
 router.delete("/delete/:id", validateToken, deleteUser)
 
@@ -39,6 +39,13 @@ router.post('/facebook',facebooklogin);
 router.post("/loginGoogle", loginGoogle);
 
 router.put("/promote/:id", promoteUser);
+
+router.put("/updateuser/:id", upload.single("image"), updateuser);
+router.get('/imageUser/:id/image',getUserImage);
+/////////////////////////////////////
+
+// router.post('/recognize', upload.single('image'), Userrecognize);
+
 
   
 module.exports = router; 

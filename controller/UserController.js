@@ -12,9 +12,40 @@ const fetch = require('node-fetch');
 const user = require('../models/user');
 const passport = require("passport");
 const FacebookStrategy = require("passport-facebook").Strategy
+const path = require('path');
+
+const { Canvas, Image, ImageData } = require('canvas');
+const faceapi = require('face-api.js');
+const { Blob } = require('buffer');
+const axios = require('axios').default;
+
+
+const multer = require('multer');
+const fs = require('fs');
+
+
+const cv = require('opencv-wasm');
 
 
 
+
+const projectDir = process.cwd();
+const imagesDir = path.join(projectDir, 'public/uploads');
+const newpath = path.join(projectDir, 'public/new_uploads');
+
+const NodeWebcam = require('node-webcam');
+const { Console } = require('console');
+
+var options = {
+    width: 1280,
+    height: 720,
+    quality: 100,
+    delay: 1,
+    saveShots: true,
+    output: "jpeg",
+    device: false,
+    callbackReturn: "location"
+};
 
 
 // =============== LOGINED USER =========================
@@ -37,31 +68,48 @@ const getConnectedUserId = (req) => {
 
 
 // =============== APIs ===========================
-
+const SECRET_KEY = '6LddytQkAAAAAHHRyYuAnU5wmOBTwAkLZzS3mfEC'
 const register = (req, res) => {
-    const { username, password, name, email, image, role, location, phone } = req.body; 
-
-    bcrypt.hash(password, 10).then((hash) => {
-        User.create({
-            username: username,
-            password: hash,
-            name: name,
-            email: email,
-            image: image,
-            role: "simple",
-            location: location,
-            phone: phone,
-            createdAt: new Date(),
-            active : true
-        }).then(() => {
-            res.json("USER REGISTERED");
-            
-        }).catch((err) => {
-            if (err) {
-                res.status(400).json({error : err})
+    try{
+        const { username, password, name, email,token, image, role, location, phone } = req.body;
+        axios({
+            url:`https://www.google.com/recaptcha/api/siteverify?secret=${SECRET_KEY}&response=${token}`,
+            method: 'POST'
+        }).then(({data}) => {
+            console.log(" your data : === ",data);
+            if(data.success){
+                bcrypt.hash(password, 10).then((hash) => {
+                    User.create({
+                        username: username,
+                        password: hash,
+                        name: name,
+                        email: email,
+                        image: image,
+                        role: "simple",
+                        location: location,
+                        phone: phone,
+                        createdAt: new Date(),
+                        active : true
+                    }).then(() => {
+                        res.json("USER REGISTERED");
+                        console.log(" your token ==== ",token);
+                    }).catch((err) => {
+                        if (err) {
+                            res.status(400).json({error : err})
+                        }
+                    })
+                })
+            }else{
+                return res.status(400).json({message: 'RECAPTCHA VERIFICATION FIELD! '})
             }
+        }).catch(error => {
+            res.status(400).json({message: 'INVALID Recaptcha '})
         })
-    })
+    }catch{
+        console.log(error)
+        res.status(400).json(error)
+    }
+
 }
 
 const login = async (req, res) => {
@@ -111,58 +159,155 @@ const profile = async (req, res) => {
         res.send(err)
     }
 }
+const addUser = async (req, res) => {
+  try {
+      const { username, password, name, email, image, role, location, phone } = req.body;
 
+      const hash = await bcrypt.hash(password, 10);
 
+      await User.create({
+          username: username,
+          password: hash,
+          name: name,
+          email: email,
+          image: image,
+          role: role || "simple",
+          location: location,
+          phone: phone,
+          createdAt: new Date(),
+          active : true
+      });
 
-const update = async (req, res) => {
-    try {
-        
-        connectedUserId = getConnectedUserId(req);
+      res.json("USER REGISTERED");
 
-        if (connectedUserId == req.body["_id"]) {
-            await User.findByIdAndUpdate(connectedUserId, req.body).then(result => {
-                res.send("User updated!")
-            })
-        } else {
-            res.send("You can't update another user.")
-        }
-    } catch (err) {
-        res.send(err)
-    }
+  } catch (error) {
+      console.log(error);
+      res.status(400).json(error);
+  }
 }
-
+// admin delete user 
 const deleteUser = async (req, res) => {
-    try {
-        connectedUserId = getConnectedUserId(req); 
-        Connected = await User.findById(connectedUserId); 
-        
-        if (Connected.role == "admin") {
-            await User.findByIdAndRemove(req.params.id)
-            res.send("User deleted!")
-        } else {
-            res.send("You must be an admin to delete another users!")
-        }
-
-    } catch (err) {
-        res.send(err)
+  try {
+      const { id } = req.params;
+  
+      // Check if user exists
+      const user = await User.findById(id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      // Delete user
+      await User.findByIdAndRemove(id);
+  
+      res.json({ message: "User deleted" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
     }
 }
-
-
+//admin ban user
 const banUser = async (req, res) => {
-    try {
-        connectedUserId = getConnectedUserId(req); 
-        Connected = await User.findById(connectedUserId); 
-        if (Connected["role"] == "admin") {
-            User.findByIdAndUpdate(req.params.id, { active: false });
-            res.send("User banned!")
-        } else {
-            res.send("You must be an admin to ban a user."); 
-        }
-    } catch (err) {
-        res.send(err)
-    }
+  try {
+      const user = await User.findById(req.params.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      if(user.active==true){
+      await User.findByIdAndUpdate(req.params.id, { active: false });
+      res.send("User banned!");   }
+      else{
+          await User.findByIdAndUpdate(req.params.id, { active: true });
+          res.send("User banned!"); 
+      }
+      
+  } catch (err) {
+      res.send(err)
+  }
 }
+//update user
+const updateUser = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const { username, password, name, email, image, role, location, phone, active } = req.body;
+
+      // Check if user exists
+      const user = await User.findById(id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Update user
+      const hash = await bcrypt.hash(password, 10);
+      user.username = username;
+      user.password = hash;
+      user.name = name;
+      user.email = email;
+      user.image = image;
+      user.role = role || "simple";
+      user.location = location;
+      user.phone = phone;
+      user.active = active;
+
+      await user.save();
+
+      res.json({ message: "User updated", user: user });
+
+  } catch (error) {
+      console.log(error);
+      res.status(400).json(error);
+  }
+}
+
+
+// const update = async (req, res) => {
+//     try {
+        
+//         connectedUserId = getConnectedUserId(req);
+
+//         if (connectedUserId == req.body["_id"]) {
+//             await User.findByIdAndUpdate(connectedUserId, req.body).then(result => {
+//                 res.send("User updated!")
+//             })
+//         } else {
+//             res.send("You can't update another user.")
+//         }
+//     } catch (err) {
+//         res.send(err)
+//     }
+// }
+
+// const deleteUser = async (req, res) => {
+//     try {
+//         connectedUserId = getConnectedUserId(req); 
+//         Connected = await User.findById(connectedUserId); 
+        
+//         if (Connected.role == "admin") {
+//             await User.findByIdAndRemove(req.params.id)
+//             res.send("User deleted!")
+//         } else {
+//             res.send("You must be an admin to delete another users!")
+//         }
+
+//     } catch (err) {
+//         res.send(err)
+//     }
+// }
+
+
+// const banUser = async (req, res) => {
+//     try {
+//         connectedUserId = getConnectedUserId(req); 
+//         Connected = await User.findById(connectedUserId); 
+//         if (Connected["role"] == "admin") {
+//             User.findByIdAndUpdate(req.params.id, { active: false });
+//             res.send("User banned!")
+//         } else {
+//             res.send("You must be an admin to ban a user."); 
+//         }
+//     } catch (err) {
+//         res.send(err)
+//     }
+// }
 
 const logout = () => async (req, res) => {
   await req.session.destroy((err) => {
@@ -285,13 +430,23 @@ const twofactorverification = async (req, res) => {
   const facebooklogin = async (req, res) => {
     const {userId, facebookId, name, email, image,username,
       password,
-      role } = req.body;
+      role,twoFactorEnabled } = req.body;
   
     try {
       let user = await User.findOne({ email });
   
       if (user) {
         console.log('User already exists:', user);
+        // const accessToken = createToken(user);
+        // res.cookie("access-token", accessToken, {
+        //     maxAge: 60 * 60 * 24 * 30 * 1000
+        // }) // cookie expires after 30 days
+
+        // req.session.user = user; 
+        // res.json(req.session.user);
+        // console.log(user)
+        // console.log(res.cookie)
+        // //res.send(user)
       } else {
         user = new User({
           userId,
@@ -301,10 +456,12 @@ const twofactorverification = async (req, res) => {
           image,
           username,
           password,
-          role
+          role,
+          twoFactorEnabled
         });
   
         await user.save();
+       
         console.log('New user created:', user);
       }
   
@@ -314,58 +471,7 @@ const twofactorverification = async (req, res) => {
       res.status(500).json({ success: false, message: 'Internal server error' });
     }
   };
-  // const { userID, accessToken } = req.body;
-
-  // const url = `https://graph.facebook.com/v2.11/${userID}/?fields=id,name,email&access_token=${accessToken}`;
-
-  // return (
-  //   fetch(url, {
-  //     method: "GET",
-  //   })
-  //     .then((response) => response.json())
-  //     // .then(response => console.log(response))
-  //     .then((response) => {
-  //       const { email, name } = response;
-  //       User.findOne({ email }).exec((err, user) => {
-  //         if (user) {
-  //           const token = jwt.sign({ _id: user._id }, process.env.MY_JWT_SIGNIN_KEY, {
-  //             expiresIn: "7d",
-  //           });
-  //           const { _id, name,username, email, password,role} = user;
-  //           return res.json({
-  //             token,
-  //             user: { _id, name,username, email, password,role },
-  //           });
-  //         } else {
-  //           let password = email + process.env.MY_JWT_SIGNIN_KEY;
-  //           user = new User({ name, email, password });
-  //           user.save((err, data) => {
-  //             if (err) {
-  //               console.log("ERROR FACEBOOK LOGIN ON USER SAVE", err);
-  //               return res.status(400).json({
-  //                 error: "User signup failed with facebook",
-  //               });
-  //             }
-  //             const token = jwt.sign(
-  //               { _id: data._id },
-  //               process.env.MY_JWT_SIGNIN_KEY,
-  //               { expiresIn: "7d" }
-  //             );
-  //             const { _id, name,username, email, password,role } = data;
-  //             return res.json({
-  //               token,
-  //               user: { _id, name,username, email, password,role },
-  //             });
-  //           });
-  //         }
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       res.json({
-  //         error: "Facebook login failed. Try later",
-  //       });
-  //     })
-  // );
+  
 // ====== google ==========
 
 const loginGoogle = async (req, res) => {
@@ -424,4 +530,123 @@ const promoteUser = async (req, res) => {
   }
 };
 
-module.exports = { register, login, profile, getAll, update, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin, loginGoogle, promoteUser }
+
+//=== AI recog
+// create instance using the above options
+
+
+
+
+
+
+
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, "public/uploads");
+  },
+
+  filename: function (req, file, cb) {
+      cb(null, req.params.id + file.originalname); // nom de l'image dans public/uploads= idUser+nomImage
+  },
+});
+
+
+//const upload = multer({ storage: storage });
+
+
+//controle de saisie sur image
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+      cb(null, true);
+  } else {
+      cb(new Error('Invalid file type, only JPEG and PNG is allowed!'), false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  // limits: {
+  //   fileSize: 1024 * 1024 * 5 // 5 MB
+  // },
+  // fileFilter: fileFilter
+
+});
+const updateuser = async (req, res) => {
+
+
+
+  //    const connectedUserId = getConnectedUserId(req); 
+  //    const connectedUserId = "64065e26c601ae53912b5476"; //test user sur la base mongo cloud 
+
+  //  const connectedUserId= await User.findById()
+
+
+  try {
+      let user = await User.findById(req.params.id);
+
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      const { username, password, name, email, role, location, phone } = req.body;
+
+      // Hash the password
+      //const hash = await bcrypt.hash(password, 10);
+
+      // Set the updated fields
+      const updatedFields = {
+          username: req.body.username,
+          password: req.body.password,
+          name: req.body.name,
+          email: req.body.email,
+          role: "simple",
+          location: req.body.location,
+          phone: req.body.phone,
+          createdAt: new Date(),
+          active: true,
+          image: req.params.id + req.file.originalname, //image = id+ nom image
+      };
+
+      // Update the user
+      user = await User.findByIdAndUpdate(req.params.id, updatedFields, { new: true });
+      // console.log(Connected)
+      res.json(user);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+  }
+
+
+
+
+}
+
+///////////get image user/////////
+const getUserImage = async (req, res) => {
+  try {
+      const user = await User.findById(req.params.id);
+
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Vérifier si l'utilisateur a une image
+      if (!user.image) {
+          return res.status(404).json({ message: 'User has no image' });
+      }
+
+      // Envoyer l'image au client
+
+      res.sendFile(path.join(__dirname, '..', 'public', 'uploads', user.image));
+
+      console.log(path.join(__dirname, '..', 'public', 'uploads', user.image))
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+module.exports = { register, login, profile, getAll, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin, loginGoogle, promoteUser,upload, getUserImage,updateuser,updateUser, deleteUser, banUser,addUser}
