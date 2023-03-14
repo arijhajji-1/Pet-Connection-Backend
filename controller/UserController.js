@@ -224,6 +224,7 @@ const banUser = async (req, res) => {
       res.send(err)
   }
 }
+
 //update user
 const updateUser = async (req, res) => {
   try {
@@ -308,6 +309,28 @@ const updateUser = async (req, res) => {
 //         res.send(err)
 //     }
 // }
+const banUser2 = async (req, res) => {
+  try {
+      connectedUserId = getConnectedUserId(req); 
+      Connected = await User.findById(connectedUserId); 
+      if (Connected["role"] == "admin") {
+          const u = await User.findById(req.params.id);
+          if (u.active == true) {
+              await User.findByIdAndUpdate(req.params.id, { active: false });
+              res.send("User banned!");
+          } else {
+              await User.findByIdAndUpdate(req.params.id, { active: true });
+              res.send("User unbanned!");
+          }
+          
+      } else {
+          res.send("You must be an admin to ban a user."); 
+      }
+  } catch (err) {
+      res.send(err)
+  }
+}
+
 
 const logout = () => async (req, res) => {
   await req.session.destroy((err) => {
@@ -437,16 +460,7 @@ const twofactorverification = async (req, res) => {
   
       if (user) {
         console.log('User already exists:', user);
-        // const accessToken = createToken(user);
-        // res.cookie("access-token", accessToken, {
-        //     maxAge: 60 * 60 * 24 * 30 * 1000
-        // }) // cookie expires after 30 days
-
-        // req.session.user = user; 
-        // res.json(req.session.user);
-        // console.log(user)
-        // console.log(res.cookie)
-        // //res.send(user)
+       
       } else {
         user = new User({
           userId,
@@ -459,7 +473,16 @@ const twofactorverification = async (req, res) => {
           role,
           twoFactorEnabled
         });
-  
+   const accessToken = createToken(user);
+        res.cookie("access-token", accessToken, {
+            maxAge: 60 * 60 * 24 * 30 * 1000
+        }) // cookie expires after 30 days
+
+        req.session.user = user; 
+        res.json(req.session.user);
+        console.log(user)
+        console.log(res.cookie)
+        //res.send(user)
         await user.save();
        
         console.log('New user created:', user);
@@ -475,7 +498,7 @@ const twofactorverification = async (req, res) => {
 // ====== google ==========
 
 const loginGoogle = async (req, res) => {
-  const { username, name, image, email, google } = req.body;
+  const { username, name, image, email, google ,twoFactorEnabled} = req.body;
   const user = await User.findOne({ email: email });
 
     if (google == true) {
@@ -492,7 +515,8 @@ const loginGoogle = async (req, res) => {
               phone: null,
               createdAt: new Date(),
               active: true,
-              google : google
+              google : google,
+              twoFactorEnabled: twoFactorEnabled
             })
             .then(() => {
                 res.json("USER REGISTERED");
@@ -583,7 +607,12 @@ const updateuser = async (req, res) => {
 
 
   try {
-      let user = await User.findById(req.params.id);
+    let user;
+    if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+      user = await User.findById(req.params.id);
+    } else {
+      user = await User.findOne({ facebookId: req.params.id });
+    }
 
       if (!user) {
           return res.status(404).json({ message: 'User not found' });
@@ -625,7 +654,12 @@ const updateuser = async (req, res) => {
 ///////////get image user/////////
 const getUserImage = async (req, res) => {
   try {
-      const user = await User.findById(req.params.id);
+    let user;
+    if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+      user = await User.findById(req.params.id);
+    } else {
+      user = await User.findOne({ facebookId: req.params.id });
+    }
 
       if (!user) {
           return res.status(404).json({ message: 'User not found' });
@@ -649,4 +683,4 @@ const getUserImage = async (req, res) => {
 };
 
 
-module.exports = { register, login, profile, getAll, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin, loginGoogle, promoteUser,upload, getUserImage,updateuser,updateUser, deleteUser, banUser,addUser}
+module.exports = { register, login, profile, getAll, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin, loginGoogle, promoteUser,upload, getUserImage,updateuser,updateUser, deleteUser, banUser,addUser,banUser2}
