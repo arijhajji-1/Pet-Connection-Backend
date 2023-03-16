@@ -72,6 +72,7 @@ const getConnectedUserId = (req) => {
 // =============== APIs ===========================
 const SECRET_KEY = '6LddytQkAAAAAHHRyYuAnU5wmOBTwAkLZzS3mfEC'
 const register = (req, res) => {
+
     try{
         const { username, password, name, email,token, image, role, location, phone } = req.body;
         axios({
@@ -111,6 +112,7 @@ const register = (req, res) => {
                 })
             }else{
                 return res.status(400).json({message: 'RECAPTCHA VERIFICATION FIELD! '})
+
             }
         }).catch(error => {
             res.status(400).json({message: 'INVALID Recaptcha '})
@@ -127,7 +129,7 @@ const login = async (req, res) => {
     const user = await User.findOne({ username: username }); 
 
     if (!user) res.status(400).json({ error: "User doesn't exist" })
-    else {
+    else if (user.active == true ) {
         const dbPassword = user.password
         bcrypt.compare(password, dbPassword).then((match) => {
             if (!match) {
@@ -147,6 +149,8 @@ const login = async (req, res) => {
                 //res.send(user)
             }
         })
+    } else {
+        res.json({ban : true}); 
     }
 }
 
@@ -157,9 +161,8 @@ const getAll = async (req, res, next) => {
         })
     } catch (err) {
         console.log(err)
-    }
+    }  
 }
-
 const profile = async (req, res) => {
     try { 
         await User.findById(req.params.id).then(result => {
@@ -270,6 +273,7 @@ const updateUser = async (req, res) => {
 }
 
 
+
 // const update = async (req, res) => {
 //     try {
         
@@ -339,7 +343,8 @@ const banUser2 = async (req, res) => {
   } catch (err) {
       res.send(err)
   }
-}
+
+
 
 
 const logout = () => async (req, res) => {
@@ -848,3 +853,4 @@ const verifyUser = async (req, res, next) => {
 }
 
 module.exports = { register, login, profile, getAll, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin, loginGoogle, promoteUser,upload, getUserImage,updateuser,updateUser, deleteUser, banUser,addUser,banUser2,updateUserPasswordCtrl,forgetPasswordToken,passwordResetCtrl,verifyUser,updateuseradmin}
+

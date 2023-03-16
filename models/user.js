@@ -40,6 +40,7 @@ var User = new schema({
     active: {
         type : Boolean
     },
+
     secret: {
         type: String,
         
@@ -77,6 +78,8 @@ User.methods.createPasswordResetToken = async function () {
         return resetToken;
     } catch (error) {
         console.log(error)
+
+  
     }
 
 };
