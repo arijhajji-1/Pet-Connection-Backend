@@ -11,7 +11,7 @@ const passport = require("passport");
 
 const { createToken, validateToken } = require('../../midill/JWT/JWT'); 
 
-const { register, login, profile, getAll, updateUser, deleteUser, banUser, logout,twofactorverification,disableTwoFactor,enableTwoFactor,facebooklogin , loginGoogle, promoteUser,updateuser,getUserImage,upload,passwordResetCtrl,forgetPasswordToken,updateUserPasswordCtrl,verifyUser } = require("../../controller/UserController")
+const { register, login, profile, getAll, updateUser, deleteUser, banUser, logout,twofactorverification,disableTwoFactor,enableTwoFactor,facebooklogin , loginGoogle, promoteUser,updateuser,getUserImage,upload,passwordResetCtrl,forgetPasswordToken,updateUserPasswordCtrl,verifyUser,addUser,updateuseradmin } = require("../../controller/UserController")
 
 
  // ========== routes
@@ -26,11 +26,11 @@ router.get("/all", getAll )
 
 router.put("/update/:id", validateToken, updateUser)
 
-router.delete("/delete/:id", validateToken, deleteUser)
+// router.delete("/delete/:id", validateToken, deleteUser)
 
 router.get("/profile/:id", validateToken, profile )
  
-router.get("/ban/:id", validateToken, banUser)
+// router.get("/ban/:id", validateToken, banUser)
 
 router.post('/logout', validateToken, logout);
 
@@ -45,6 +45,7 @@ router.post("/loginGoogle", loginGoogle);
 router.put("/promote/:id", promoteUser);
 
 router.put("/updateuser/:id", upload.single("image"), updateuser);
+router.put("/updateuseradmin/:id", upload.single("image"), updateuseradmin);
 router.get('/imageUser/:id/image',getUserImage);
 /////////////////////////////////////
 
@@ -55,4 +56,8 @@ router.put("/password", validateToken, updateUserPasswordCtrl);
 router.post("/forget-password-token", forgetPasswordToken);
 // Password reset
 router.put("/resetpassword", passwordResetCtrl);
+router.post('/add',addUser);
+router.delete("/delete/:id", deleteUser);
+router.get("/ban/:id", banUser);
+router.put("/update/:id", updateUser);
 module.exports = router; 

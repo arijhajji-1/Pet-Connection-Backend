@@ -184,7 +184,7 @@ const addUser = async (req, res) => {
           name: name,
           email: email,
           image: image,
-          role: role || "simple",
+          role: role || "admin",
           location: location,
           phone: phone,
           createdAt: new Date(),
@@ -666,6 +666,62 @@ const updateuser = async (req, res) => {
 
 }
 
+const updateuseradmin = async (req, res) => {
+
+
+
+  //    const connectedUserId = getConnectedUserId(req); 
+  //    const connectedUserId = "64065e26c601ae53912b5476"; //test user sur la base mongo cloud 
+
+  //  const connectedUserId= await User.findById()
+
+
+  try {
+    let user;
+    if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+      user = await User.findById(req.params.id);
+    } else {
+      user = await User.findOne({ facebookId: req.params.id });
+    }
+
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      const { username, password, name, email, role, location, phone } = req.body;
+
+      // Hash the password
+      //const hash = await bcrypt.hash(password, 10);
+
+      // Set the updated fields
+      const updatedFields = {
+          username: req.body.username,
+          password: req.body.password,
+          name: req.body.name,
+          email: req.body.email,
+          role: "admin",
+          location: req.body.location,
+          phone: req.body.phone,
+          createdAt: new Date(),
+          active: true,
+          image: req.params.id + req.file.originalname, //image = id+ nom image
+      };
+
+      // Update the user
+      user = await User.findByIdAndUpdate(req.params.id, updatedFields, { new: true });
+      // console.log(Connected)
+      res.json(user);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+  }
+
+
+
+
+}
+
+
 ///////////get image user/////////
 const getUserImage = async (req, res) => {
   try {
@@ -796,6 +852,5 @@ const verifyUser = async (req, res, next) => {
   }
 }
 
-
-module.exports = { register, login, profile, getAll, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin, loginGoogle, promoteUser,upload, getUserImage,updateuser,updateUser, deleteUser, banUser,addUser,banUser2,updateUserPasswordCtrl,forgetPasswordToken,passwordResetCtrl,verifyUser}
+module.exports = { register, login, profile, getAll, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin, loginGoogle, promoteUser,upload, getUserImage,updateuser,updateUser, deleteUser, banUser,addUser,banUser2,updateUserPasswordCtrl,forgetPasswordToken,passwordResetCtrl,verifyUser,updateuseradmin}
 
