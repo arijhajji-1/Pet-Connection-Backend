@@ -45,7 +45,9 @@ app.use(session({
 
 // ============ routes =================
 var useRouter = require('./routes/User/user'); 
+var eventRouter = require('./routes/Events/Events');
 app.use('/user', useRouter); 
+app.use('/event',eventRouter);
 
 
 
