@@ -344,7 +344,7 @@ const banUser2 = async (req, res) => {
       res.send(err)
   }
 
-
+}
 
 
 const logout = () => async (req, res) => {
@@ -853,4 +853,3 @@ const verifyUser = async (req, res, next) => {
 }
 
 module.exports = { register, login, profile, getAll, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin, loginGoogle, promoteUser,upload, getUserImage,updateuser,updateUser, deleteUser, banUser,addUser,banUser2,updateUserPasswordCtrl,forgetPasswordToken,passwordResetCtrl,verifyUser,updateuseradmin}
-
