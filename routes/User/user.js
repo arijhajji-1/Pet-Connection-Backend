@@ -56,8 +56,9 @@ router.put("/password", validateToken, updateUserPasswordCtrl);
 router.post("/forget-password-token", forgetPasswordToken);
 // Password reset
 router.put("/resetpassword", passwordResetCtrl);
-router.post('/add',addUser);
-router.delete("/delete/:id", deleteUser);
-router.get("/ban/:id", banUser);
-router.put("/update/:id", updateUser);
+router.post('/add',addUser)
+router.delete("/delete/:id", deleteUser)
+router.get("/ban/:id", banUser)
+router.put("/update/:id", updateUser)
+
 module.exports = router; 
