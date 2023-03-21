@@ -31,11 +31,10 @@ const eventSchema = new mongoose.Schema({
    
 
       },
-  organizer: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
+      organizer: {
+        type: String,
+        required: true,
+      },
   attendees: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

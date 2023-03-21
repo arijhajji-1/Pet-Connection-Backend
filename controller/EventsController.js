@@ -1,8 +1,9 @@
 const Event = require('../models/Events');
 const { sign, verify } = require('jsonwebtoken')
-const user = require('../models/user');
 const multer = require('multer');
 const fs = require('fs');
+const User = require('../models/user');
+const { updateuseradmin } = require('./UserController');
 
 const upload = multer({ dest: 'uploads/' });
 // GET all events
@@ -36,51 +37,65 @@ const getConnectedUserId = (req) => {
         return res.status(401).json({ message: "Access token not found" });
     }
     const decodedToken = verify(accessToken, "azjdn1dkd3ad");
-    req.userId = decodedToken.id;
+    UserId= decodedToken.id;
+    console.log(decodedToken.id); // Add this line to check the value of decodedToken.id
+
     
-    return req.userId; 
+    return UserId; 
     //const user = await User.findById(req.userId);
     //res.send(user)
 }
 // CREATE a new event
 const createEvent = async (req, res) => {
-    const connectedUserId = getConnectedUserId(req); 
+  let { title, description, date, location, image } = req.body;
+
+  const userId= getConnectedUserId(req);
+
   
-    const {title, description, date, location,image } = req.body;
-  
-    // check if the event already exists
-    const existingEvent = await Event.findOne({ title, date });
-    if (existingEvent) {
-      return res.status(400).json({ message: 'An event with the same title and date already exists' });
+
+  // check if the event already exists
+  const existingEvent = await Event.findOne({ title, date });
+  if (existingEvent) {
+    return res
+      .status(400)
+      .json({ message: "An event with the same title and date already exists" });
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(400).json({ message: "User not found" });
+  }
+
+  try {
+    const newEvent = new Event({
+      title,
+      description,
+      date,
+      location,
+      image,
+      organizer: user.username, // set the organizer field to the user's id
+      attendees: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    if (req.file) {
+      // Rename the file to a unique name to prevent overwriting
+      const filename = `${Date.now()}-${req.file.originalname}`;
+      const filepath = `uploads/${filename}`;
+      // Move the file to the uploads directory
+      fs.renameSync(req.file.path, filepath);
+      newEvent.image = filename;
     }
-  
-    try {
-      const newEvent = new Event({
-        title,
-        description,
-        date,
-        location,
-        image,
-        organizer: connectedUserId,
-        attendees: [],
-        createdAt: new Date(),
-        updatedAt: new Date()
-      });
-      if (req.file) {
-        // Rename the file to a unique name to prevent overwriting
-        const filename = `${Date.now()}-${req.file.originalname}`;
-        const filepath = `uploads/${filename}`;
-        // Move the file to the uploads directory
-        fs.renameSync(req.file.path, filepath);
-        newEvent.image = filename;
-      }
-      await newEvent.save();
-      res.json(newEvent);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Server error' });
-    }
-  };
+
+    await newEvent.save();
+    res.json(newEvent);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
   
 
 // UPDATE an existing event by ID
