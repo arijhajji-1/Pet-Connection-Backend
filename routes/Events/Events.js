@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser")
 const bodyparser = require("body-parser")  
 router.use(express.json())
 router.use(cookieParser())
-const {getAllEvents, getEventById, createEvent, updateEventById, deleteEventById ,  addAttendeeById, removeAttendeeById }= require("../../controller/EventsController")
+const {getAllEvents, getEventById, createEvent, updateEventById, upload,deleteEventById ,  addAttendeeById, removeAttendeeById }= require("../../controller/EventsController")
 
 // GET all events
 router.get('/getAll', getAllEvents);
@@ -14,10 +14,10 @@ router.get('/getAll', getAllEvents);
 router.get('/get/:id', getEventById);
 
 // CREATE a new event
-router.post('/add', validateToken, createEvent);
+router.post('/add', upload.single('image'),validateToken, createEvent);
 
 // UPDATE an existing event by ID
-router.put('/update/:id', validateToken, updateEventById);
+router.put('/update/:id',upload.single('image'), validateToken, updateEventById);
 
 // DELETE an existing event by ID
 router.delete('/delete/:id', validateToken, deleteEventById);

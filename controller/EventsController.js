@@ -1,7 +1,10 @@
 const Event = require('../models/Events');
 const { sign, verify } = require('jsonwebtoken')
 const user = require('../models/user');
+const multer = require('multer');
+const fs = require('fs');
 
+const upload = multer({ dest: 'uploads/' });
 // GET all events
 const getAllEvents = async (req, res) => {
   try {
@@ -43,7 +46,7 @@ const getConnectedUserId = (req) => {
 const createEvent = async (req, res) => {
     const connectedUserId = getConnectedUserId(req); 
   
-    const {title, description, date, location } = req.body;
+    const {title, description, date, location,image } = req.body;
   
     // check if the event already exists
     const existingEvent = await Event.findOne({ title, date });
@@ -57,11 +60,20 @@ const createEvent = async (req, res) => {
         description,
         date,
         location,
+        image,
         organizer: connectedUserId,
         attendees: [],
         createdAt: new Date(),
         updatedAt: new Date()
       });
+      if (req.file) {
+        // Rename the file to a unique name to prevent overwriting
+        const filename = `${Date.now()}-${req.file.originalname}`;
+        const filepath = `uploads/${filename}`;
+        // Move the file to the uploads directory
+        fs.renameSync(req.file.path, filepath);
+        newEvent.image = filename;
+      }
       await newEvent.save();
       res.json(newEvent);
     } catch (error) {
@@ -75,7 +87,7 @@ const createEvent = async (req, res) => {
 const updateEventById = async (req, res) => {
     const connectedUserId = getConnectedUserId(req); 
 
-  const { title, description, date, location } = req.body;
+  const { title, description, date, location,image } = req.body;
   try {
     let event = await Event.findById(req.params.id);
     if (!event) {
@@ -83,6 +95,19 @@ const updateEventById = async (req, res) => {
     }
     if (event.organizer.toString() !== connectedUserId.toString()) { // check if the current user is the organizer of the event
       return res.status(403).json({ message: 'You are not authorized to update this event' });
+    }
+    if (req.file) {
+      // Remove the old image file
+      if (event.image) {
+        const filepath = `uploads/${event.image}`;
+        fs.unlinkSync(filepath);
+      }
+      // Rename the new file to a unique name to prevent overwriting
+      const filename = `${Date.now()}-${req.file.originalname}`;
+      const filepath = `uploads/${filename}`;
+      // Move the file to the uploads directory
+      fs.renameSync(req.file.path, filepath);
+      event.image = filename;
     }
     event.title = title;
     event.description = description;
@@ -159,4 +184,4 @@ const addAttendeeById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
     }
     };
-module.exports = { getAllEvents, getEventById, createEvent, updateEventById, deleteEventById ,  addAttendeeById, removeAttendeeById };
+module.exports = { getAllEvents, getEventById, createEvent, updateEventById, deleteEventById ,upload,  addAttendeeById, removeAttendeeById };
