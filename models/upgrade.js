@@ -12,6 +12,9 @@ var Upgrade = new schema({
     ref: "User",
     required: true,
   },
+  bio: {
+    type: String,
+  },
   file: {
     type: String,
     required: true,
@@ -19,6 +22,12 @@ var Upgrade = new schema({
   type: {
     type: String,
     required: true,
+  },
+  latitude: {
+    type: Number,
+  },
+  longitude: {
+    type: Number,
   },
 });
  

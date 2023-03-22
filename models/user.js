@@ -31,8 +31,11 @@ var User = new schema({
     image: {
         type: String
     },
-    location: {
-        type: String 
+    latitude: {
+    type : Number
+    },
+    longitude: {
+    type : Number
     },
     createdAt: {
         type: Date

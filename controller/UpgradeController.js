@@ -34,12 +34,15 @@ const upgradeUser = (req, res) => {
     }
     // res.json({ message: "File uploaded successfully" });
         
-        const { name, user, type } = req.body;
+        const { name, user, type, latitude, longitude, bio } = req.body;
         Upgrade.create({
           name: name,
           user: user,
           file: `${req.body.user}${file.filename}`,
           type: type,
+          latitude: latitude,
+          longitude: longitude,
+          bio : bio
         }).then((upgrade) => {
           res.send(upgrade);
         });
@@ -93,7 +96,7 @@ const changeType = async (req, res) => {
     }
 
     // Delete user
-    await us.update({ role : req.body.type });
+    await us.update({ role : req.body.type, latitude : req.body.latitude, longitude : req.body.longitude });
 
     res.json({ message: "User upgraded to " + req.body.type });
   } catch (error) {
