@@ -11,7 +11,11 @@ const passport = require("passport");
 
 const { createToken, validateToken } = require('../../midill/JWT/JWT'); 
 
-const { register, login, profile, getAll, updateUser, deleteUser, banUser, logout,twofactorverification,disableTwoFactor,enableTwoFactor,facebooklogin , loginGoogle, promoteUser,updateuser,getUserImage,upload,passwordResetCtrl,forgetPasswordToken,updateUserPasswordCtrl,verifyUser,addUser,updateuseradmin } = require("../../controller/UserController")
+const { register, login, profile, getAll, updateUser, deleteUser, banUser, logout,
+    twofactorverification, disableTwoFactor, enableTwoFactor, facebooklogin, loginGoogle,
+    promoteUser, updateuser, getUserImage, upload, passwordResetCtrl, forgetPasswordToken,
+    updateUserPasswordCtrl, verifyUser, addUser, updateuseradmin 
+} = require("../../controller/UserController")
 
 
  // ========== routes
@@ -60,5 +64,32 @@ router.post('/add',addUser)
 router.delete("/delete/:id", deleteUser)
 router.get("/ban/:id", banUser)
 router.put("/update/:id", updateUser)
+
+
+
+
+
+
+
+
+
+// ====== SPRINT 2 : Module Association 
+const multer = require("multer");
+const path = require("path");
+
+const {
+  upgradeUser,
+  getAllUpgrades,
+  deleteUpgrade,
+  changeType,
+} = require("../../controller/UpgradeController");
+
+router.post("/upgrade", upload.single('file'), upgradeUser); 
+router.get("/AllUpgrades", validateToken, getAllUpgrades); 
+router.delete("/deleteUpgrade/:id", validateToken, deleteUpgrade); 
+router.put("/changeType/:id", validateToken, changeType); 
+
+
+
 
 module.exports = router; 
