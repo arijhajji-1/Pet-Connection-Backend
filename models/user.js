@@ -1,30 +1,29 @@
 const mongo = require('mongoose');
+const schema = mongo.Schema; 
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const schema = mongo.Schema;
-
 var User = new schema({
     username: {
         type: String,
-        required: true,
+       // required: true,
         unique: true
     },
     password: {
         type: String,
-        required: true
+       // required: true 
     },
     name: {
         type: String,
-        required: true
+       // required : true
     },
     email: {
         type: String,
-        required: true,
-       // unique: true
+        //required: true,
+        //unique : true
     },
     role: {
         type: String,
-        required: true
+        //required : true
     },
     phone: {
         type: String
@@ -33,18 +32,35 @@ var User = new schema({
         type: String
     },
     location: {
-        type: String
+        type: String 
     },
     createdAt: {
         type: Date
     },
+    active: {
+        type : Boolean
+    },
+
+    secret: {
+        type: String,
+        
+      },
+      twoFactorEnabled: {
+        type: Boolean,
+        default: false
+      },
+      twoFactorVerified:
+        {
+            type: Boolean,
+            default: false
+        },
+     facebookId: String,
+     google: {
+        type : Boolean
+    },
     passwordChangeAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
-    active: {
-        type: Boolean,
-
-    },
     isUserVerified: {type: Boolean, default: false},
 });
 
@@ -62,6 +78,8 @@ User.methods.createPasswordResetToken = async function () {
         return resetToken;
     } catch (error) {
         console.log(error)
+
+  
     }
 
 };
@@ -81,4 +99,10 @@ User.methods.isPasswordMatched = async function (enteredPassword) {
 //     console.log("ffgfr ");
 //     next();
 // });
-module.exports = mongo.model("User", User)
+
+
+     
+
+
+
+module.exports = mongo.model("user", User)
