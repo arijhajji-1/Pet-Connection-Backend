@@ -85,7 +85,12 @@ const {
   getAllAssociations
 } = require("../../controller/UpgradeController");
 
-router.post("/upgrade", upload.single('file'), upgradeUser); 
+router.post("/upgrade", upload.fields([
+    { name: "file", maxCount: 1 },
+    { name: "logo", maxCount: 1 },
+]), upgradeUser);
+
+  
 router.get("/AllUpgrades", validateToken, getAllUpgrades); 
 router.delete("/deleteUpgrade/:id", validateToken, deleteUpgrade); 
 router.put("/changeType/:id", validateToken, changeType); 

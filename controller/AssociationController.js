@@ -59,8 +59,23 @@ const getAllAssociations = (req, res) => {
 };
 
 
+const deleteAssociation = async (req, res) => {
+    try {
+        // connectedUserId = getConnectedUserId(req); 
+        // Connected = await User.findById(connectedUserId);
+        await Association.findByIdAndRemove(req.params.id);
+        res.send("Association deleted!");
+
+    } catch (err) {
+        res.send(err)
+    }
+}
+
+
+
 
 module.exports = {
-    addAssociation,
-    getAllAssociations
+  addAssociation,
+  getAllAssociations,
+  deleteAssociation,
 }; 

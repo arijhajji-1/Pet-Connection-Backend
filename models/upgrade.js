@@ -19,6 +19,9 @@ var Upgrade = new schema({
     type: String,
     required: true,
   },
+  logo: {
+    type: String, 
+  },
   type: {
     type: String,
     required: true,

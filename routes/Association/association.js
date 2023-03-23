@@ -13,10 +13,11 @@ const path = require("path");
 
 const { upload } = require("../../controller/UserController");
 
-const { addAssociation, getAllAssociations } = require("../../controller/AssociationController");
+const { addAssociation, getAllAssociations, deleteAssociation } = require("../../controller/AssociationController");
 
 router.post("/addAssociation",  upload.single('file'), addAssociation);
 router.get("/allAssociations",   getAllAssociations);
+router.delete("/delete/:id", deleteAssociation);
 
 
 

@@ -12,9 +12,11 @@ const upload = multer({ dest: "public/upgrades/" });
 
 const upgradeUser = (req, res) => {
  
-     const file = req.file;
+    // ======== VERIFICATION FILE ===================================
+
+     const file = req.files["file"][0];
     if (!file) {
-        return res.status(400).json({ error: "Please select a file" });
+        return res.status(400).json({ error: "Please select a file 1" });
     }
     const oldPath = path.join(__dirname, "..", file.path);
     const extension = path.extname(file.originalname);
@@ -28,17 +30,47 @@ const upgradeUser = (req, res) => {
 
     // Rename the file to its original name with extension
     fs.rename(oldPath, newPath, (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Failed to upload the file" });
+      }
+    })
+        
+      
+      // ======== LOGO ===================================
+
+    const logo = req.files["logo"][0];
+    if (!logo) {
+        return res.status(400).json({ error: "Please select a file2" });
+    }
+    const oldPath2 = path.join(__dirname, "..", logo.path);
+    const extension2 = path.extname(logo.originalname);
+    const newPath2 = path.join(
+    __dirname,
+    "..",
+    "public",
+    "upgrades",
+    `logo${req.body.name}${logo.filename}`
+    );
+
+    // Rename the file to its original name with extension
+    fs.rename(oldPath2, newPath2, (err) => {
     if (err) {
         console.error(err);
         return res.status(500).json({ error: "Failed to upload the file" });
     }
-    // res.json({ message: "File uploaded successfully" });
+      
+      
+      
+      
+      
         
         const { name, user, type, latitude, longitude, bio } = req.body;
         Upgrade.create({
           name: name,
           user: user,
           file: `${req.body.user}${file.filename}`,
+          logo: `logo${req.body.name}${logo.filename}`,
           type: type,
           latitude: latitude,
           longitude: longitude,
