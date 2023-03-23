@@ -31,11 +31,23 @@ var User = new schema({
     image: {
         type: String
     },
+
+    // ===== association =======
+    
     latitude: {
-    type : Number
+        type : Number
     },
     longitude: {
-    type : Number
+        type : Number
+    },
+    association: {
+        type : String
+    },
+
+    // ============================
+
+    bio: {
+        type : String  
     },
     createdAt: {
         type: Date

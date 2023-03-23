@@ -96,7 +96,13 @@ const changeType = async (req, res) => {
     }
 
     // Delete user
-    await us.update({ role : req.body.type, latitude : req.body.latitude, longitude : req.body.longitude });
+    await us.update({
+      role: req.body.type,
+      latitude: req.body.latitude,
+      longitude: req.body.longitude,
+      bio: req.body.bio,
+      association : req.body.association
+    });
 
     res.json({ message: "User upgraded to " + req.body.type });
   } catch (error) {
@@ -106,9 +112,22 @@ const changeType = async (req, res) => {
 };
 
 
+const getAllAssociations = async (req, res) => {
+  try {
+    user.find({role : "Association"}).then((result) => {
+      res.send(result);
+    });   
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+
 module.exports = {
   upgradeUser,
   getAllUpgrades,
   deleteUpgrade,
   changeType,
+  getAllAssociations,
 }; 
