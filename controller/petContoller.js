@@ -3,7 +3,9 @@ const pet=require("../models/Pet")
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const { LocalStorage } = require('node-localstorage');
-
+const fs = require('fs');
+const axios = require('axios');
+const FormData = require('form-data');
 // Create a new LocalStorage instance with a specified storage path
 const localStorage = new LocalStorage('./localstorage');
 
@@ -44,7 +46,7 @@ async function addPet(req, res, next) {
      
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
-      }
+      } 
       const pets = await pet.find({ user: req.userId  });
        
       return res.json(pets);
@@ -85,18 +87,34 @@ async function addPet(req, res, next) {
         res.status(201).json({ message: 'Pet added successfully' });
       
     }*/
+   
+ 
     //=================================================================================================================================test
     async function addPetwithUser (req, res)  {
+
   
         // Create a new pet document and add it to the user's pets array
        const user = JSON.parse(req.body.user);
       console.log(req.body.images)
          
        const user1 = await User.findById(user._id);
+       
+  // Make a request to the prediction API using the first image in the array
+  const form = new FormData();
+  const firstImage = req.files[0];
+  form.append('image', fs.createReadStream(firstImage.path), firstImage.filename);
+  const response = await axios.post('http://localhost:8000/pet/predict/', form, {
+    headers: {
+      ...form.getHeaders(),
+    },
+  });
+  const predictedBreed = response.data; 
+  console.log("aaaaaaaaaaaaaaaaaaaaa"+predictedBreed)
         const Pet = new pet({
+
           name: req.body.name, 
           color: req.body.color, 
-          breed: req.body.breed,      
+          breed: predictedBreed,      
           age: req.body.age,
           categoryPet: req.body.categoryPet, 
        user: user1._id,
