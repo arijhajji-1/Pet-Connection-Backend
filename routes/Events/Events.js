@@ -14,18 +14,18 @@ router.get('/getAll', getAllEvents);
 router.get('/get/:id', getEventById);
 
 // CREATE a new event
-router.post('/add', upload.single('image'),validateToken, createEvent);
+router.post('/add', upload.single('image'), createEvent);
 
 // UPDATE an existing event by ID
-router.put('/update/:id',upload.single('image'), validateToken, updateEventById);
+router.put('/update/:id',upload.single('image'), updateEventById);
 
 // DELETE an existing event by ID
-router.delete('/delete/:id', validateToken, deleteEventById);
+router.delete('/delete/:id', deleteEventById);
 // ADD a user as an attendee to an event by ID
-router.post('/addAttendees/:id', validateToken,addAttendeeById);
+router.post('/addAttendees/:id',addAttendeeById);
 
 // REMOVE a user as an attendee from an event by ID
-router.delete('/deleteAttendees/:id', validateToken, removeAttendeeById);
+router.delete('/deleteAttendees/:id', removeAttendeeById);
 
 
 module.exports = router;

@@ -6,29 +6,11 @@ const bodyParser = require("body-parser");
 const cors = require('cors');
 const session = require('express-session')
 
-// ====== google auth =============
-// require("dotenv").config(); 
-// const passport = require("passport"); 
-// const cookieSession = require("cookie-session"); 
-// const passportSetup = require("./routes/User/passport"); 
-// const authRoute = require("./routes/User/auth");
-
-
 // =========== Database Connection ==============
 mongo.connect("mongodb+srv://yosramekaoui:yosra@cluster0.aalwf4q.mongodb.net/ace?retryWrites=true&w=majority"
 ).then(()=>console.log("Db Connect")).catch((err)=>{
     console.log(err);
 });
-
-// mongo.connect(mongoconnection.url, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-// }).then(() => {
-//     console.log("DataBase Connected");
-// }).catch((err) => {
-//     console.log(err);
-// });
-
 
 // ============= configuration express ================
 var app = express();
@@ -48,6 +30,7 @@ var useRouter = require('./routes/User/user');
 var eventRouter = require('./routes/Events/Events');
 app.use('/user', useRouter); 
 app.use('/event',eventRouter);
+app.use('/uploads', express.static('uploads'));
 
 
 

@@ -3,7 +3,7 @@ const { sign, verify } = require('jsonwebtoken')
 const multer = require('multer');
 const fs = require('fs');
 const User = require('../models/user');
-const { updateuseradmin } = require('./UserController');
+const mongoose = require('mongoose');
 
 const upload = multer({ dest: 'uploads/' });
 // GET all events
@@ -30,59 +30,44 @@ const getEventById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 const getConnectedUserId = (req) => {
-    // get User
-    const accessToken = req.cookies["access-token"];
-    if (!accessToken) {
-        return res.status(401).json({ message: "Access token not found" });
-    }
-    const decodedToken = verify(accessToken, "azjdn1dkd3ad");
-    UserId= decodedToken.id;
-    console.log(decodedToken.id); // Add this line to check the value of decodedToken.id
+  return req.body.userId;
+};
 
-    
-    return UserId; 
-    //const user = await User.findById(req.userId);
-    //res.send(user)
-}
-// CREATE a new event
 const createEvent = async (req, res) => {
-  let { title, description, date, location, image } = req.body;
-
-  const userId= getConnectedUserId(req);
-
-  
-
-  // check if the event already exists
-  const existingEvent = await Event.findOne({ title, date });
-  if (existingEvent) {
-    return res
-      .status(400)
-      .json({ message: "An event with the same title and date already exists" });
-  }
-
-  const user = await User.findById(userId);
-  if (!user) {
-    return res.status(400).json({ message: "User not found" });
-  }
+  let { title, description, date, location, image} = req.body;
 
   try {
+    // Check if user exists
+    const user = await User.findById(req.body.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: `User with id ${req.body.userId} not found` });
+    }
+
+    // check if the event already exists
+    const existingEvent = await Event.findOne({ title, date });
+
+    if (existingEvent) {
+      return res.status(400).json({ message: "An event with the same title and date already exists" });
+    }
+
     const newEvent = new Event({
       title,
       description,
       date,
       location,
       image,
-      organizer: user.username, // set the organizer field to the user's id
+      organizer: user.username,
       attendees: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+
     if (req.file) {
-      // Rename the file to a unique name to prevent overwriting
       const filename = `${Date.now()}-${req.file.originalname}`;
       const filepath = `uploads/${filename}`;
-      // Move the file to the uploads directory
       fs.renameSync(req.file.path, filepath);
       newEvent.image = filename;
     }
@@ -158,25 +143,34 @@ const deleteEventById = async (req, res) => {
 };
 // ADD a user as an attendee to an event by ID
 const addAttendeeById = async (req, res) => {
-    connectedUserId = getConnectedUserId(req); 
+  const connectedUserId = getConnectedUserId(req);
 
-    try {
+  try {
     let event = await Event.findById(req.params.id);
     if (!event) {
-    return res.status(404).json({ message: 'Event not found' });
+      return res.status(404).json({ message: 'Event not found' });
     }
-    if (event.attendees.includes(connectedUserId )) { // check if the current user is already an attendee
-    return res.status(400).json({ message: 'You have already joined this event' });
+    if (event.attendees.includes(req.body.userId)) { // check if the current user is already an attendee
+      return res.status(400).json({ message: 'You have already joined this event' });
     }
-    event.attendees.push(connectedUserId );
-    event.updatedAt = new Date();
+    event.attendees.push(req.body.userId); // add the user to the attendees array
     await event.save();
     res.json(event);
-    } catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
-    }
-    };
+  }
+};
+
+
+
+
+
+
+
+
+
+
     
     // REMOVE a user as an attendee from an event by ID
     const removeAttendeeById = async (req, res) => {
