@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 // Define the Lost schema
 const lostSchema = new mongoose.Schema({
-  name: {
+  
+  type: {
     type: String,
    // required: true
   },
@@ -10,15 +11,19 @@ const lostSchema = new mongoose.Schema({
     type: String,
     //required: true
   },
-  image: {
+  image: [{
     type: String,
    // required: true
-  },
+  }],
   location: {
     type: String,
     //required: true
   },
-  color: {
+  color: {  
+    type: String,
+    //required: true
+  },
+  breed: {
     type: String,
     //required: true
   }

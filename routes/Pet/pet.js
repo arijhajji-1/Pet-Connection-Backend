@@ -3,6 +3,7 @@ const router=express.Router();
 const User = require('../../models/user')
 const bodyparser = require("body-parser")
 const controller=require("../../controller/petContoller")
+const lostcontroller=require("../../controller/LostController")
 const bcrypt = require("bcrypt"); 
 const cookieParser = require("cookie-parser")
 const FormData = require('form-data');
@@ -25,29 +26,11 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 router.post("/addpet",controller.addPet);
 router.post("/addpetwithUser",upload.array("images"),controller.addPetwithUser);
+router.post("/addlost",upload.array("image"),lostcontroller.addlostwithUser);
 router.get('/AllpetsByUser',validateToken,controller.getAllpets);
 router.delete('/deletepet/:petId',validateToken,controller.deletepet);
 router.put('/updatepet/:id',validateToken,controller.updatePetwithUser);
-
-// router.post('/addpetwithUser', upload.array('images'), controller.addPetwithUser, (req, res) => {
-//   const form = new FormData();
-//   const firstImage = req.files[0]; // get the first image from the array
-//   form.append('image', fs.createReadStream(firstImage.path), firstImage.filename); // append only the first image
-//   axios.post('http://localhost:8000/pet/predict/', form, {
-//     headers: {
-//       ...form.getHeaders(),
-//     },
-//   })
-//     .then((response) => {
-//       console.log(response);
-//       console.log("breed="+response.data);
-//       res.json(response.data);
-//     })
-//     .catch((error) => {
-//       console.log(error);
-//       res.json({ error: 'Something went wrong.' });
-//     });
-// });
+ 
 
 
 

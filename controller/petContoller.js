@@ -56,44 +56,12 @@ async function addPet(req, res, next) {
     }
   }
 // POST a new pet for a user
-/*
- async function addPetwithUser (req, res)  {
-    
-        const accessToken = req.cookies["access-token"];
-
-        if (!accessToken) {
-          return res.status(401).json({ message: "Access token not found" });
-        }
-       
-          const decodedToken = verify(accessToken, "azjdn1dkd3ad");
-           
-          req.userId = decodedToken.id;
-    const user = await User.findById(req.userId );
  
-
-        // Create a new pet document and add it to the user's pets array
-        const Pet = new pet({
-          name: req.body.name,
-          color: req.body.color,
-          breed: req.body.breed,
-          age: req.body.age,
-          categoryPet: req.body.categoryPet,
-          user: user,
-        });
-        await Pet.save();
-        user.pets.push(Pet._id);
-        await user.save();
-    
-        res.status(201).json({ message: 'Pet added successfully' });
-      
-    }*/
    
  
     //=================================================================================================================================test
     async function addPetwithUser (req, res)  {
-
-  
-        // Create a new pet document and add it to the user's pets array
+        // Create a new pet document and add it to the   user's pets array
        const user = JSON.parse(req.body.user);
       console.log(req.body.images)
          
@@ -109,9 +77,8 @@ async function addPet(req, res, next) {
     },
   });
   const predictedBreed = response.data; 
-  console.log("aaaaaaaaaaaaaaaaaaaaa"+predictedBreed)
+  console.log("breed="+predictedBreed)
         const Pet = new pet({
-
           name: req.body.name, 
           color: req.body.color, 
           breed: predictedBreed,      
