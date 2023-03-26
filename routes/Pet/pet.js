@@ -27,6 +27,8 @@ const upload = multer({ storage: storage });
 router.post("/addpet",controller.addPet);
 router.post("/addpetwithUser",upload.array("images"),controller.addPetwithUser);
 router.post("/addlost",upload.array("image"),lostcontroller.addlostwithUser);
+router.get("/getAllLostAndFound" ,lostcontroller.getAllLost);
+router.post("/getAllLostAndFounduser" ,lostcontroller.getAllLostsuser);
 router.get('/AllpetsByUser',validateToken,controller.getAllpets);
 router.delete('/deletepet/:petId',validateToken,controller.deletepet);
 router.put('/updatepet/:id',validateToken,controller.updatePetwithUser);

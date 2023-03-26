@@ -28,7 +28,6 @@ async function addlostwithUser(req, res) {
   const predictedBreed = response.data;
   console.log("breed=" + predictedBreed)
   const Pet = new lost({
-
     color: req.body.color,
     breed: predictedBreed,
     location:req.body.location,
@@ -36,7 +35,7 @@ async function addlostwithUser(req, res) {
     user: user1._id, 
     description:req.body.description,
      image: req.files.map((file) => file.filename),
-  });
+  }); 
   
   await Pet.save();
    user1.losts.push(Pet._id);
@@ -47,32 +46,31 @@ async function addlostwithUser(req, res) {
 }
 
 // GET all pets for the authenticated user
-async function getAllLosts(req, res) {
+async function getAllLostsuser(req, res) {
   try { 
-
-    const accessToken = req.cookies["access-token"];
-
-    if (!accessToken) {
-      return res.status(401).json({ message: "Access token not found" });
-    }
-
-    const decodedToken = verify(accessToken, "azjdn1dkd3ad");
-
-    req.userId = decodedToken.id;
-
-    const user = await User.findById(req.userId);
-
-    if (!user) {
+  
+    console.log(req.body.user);
+    
+    if (!req.body.user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    const pets = await pet.find({ user: req.userId });
-
+    const pets = await lost.find({ user: req.body.user._id });
     return res.json(pets);
   } catch (err) {
     console.error(`Error: ${err}`);
     return res.status(500).json({ error: 'Server error' });
   }
 }
+
+// get all lost and found pets 
+async function getAllLost(req, res) {
+  try {
+    const lostList = await lost.find();
+    res.status(200).json(lostList);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
 module.exports={
-  addlostwithUser
+  addlostwithUser,getAllLost,getAllLostsuser
 }

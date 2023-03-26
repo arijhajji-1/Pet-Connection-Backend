@@ -26,7 +26,11 @@ const lostSchema = new mongoose.Schema({
   breed: {
     type: String,
     //required: true
-  }
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
 });
 
 // Create the Lost model

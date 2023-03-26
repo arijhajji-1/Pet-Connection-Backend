@@ -73,6 +73,8 @@ server.listen(3000, () => console.log('server'))
 
 //================//
 //============= router Pet =================
-
+// Serve static files from the "uploads" directory
+app.use(express.static('public')); 
+app.use('/uploads', express.static('uploads'));
 var petRouter = require('./routes/Pet/pet'); 
 app.use('/pet', petRouter); 
