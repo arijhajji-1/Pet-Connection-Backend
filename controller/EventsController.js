@@ -32,19 +32,18 @@ const getEventById = async (req, res) => {
 };
 
 const getConnectedUserId = (req) => {
-  return req.body.userId;
+  return req.query.userId || req.params.userId;
 };
 
+
+
 const createEvent = async (req, res) => {
-  let { title, description, date, location, image} = req.body;
+  let { title, description, date, location, image ,organizer} = req.body;
+ // Add this line to check the request body
 
   try {
     // Check if user exists
-    const user = await User.findById(req.body.userId);
-
-    if (!user) {
-      return res.status(404).json({ message: `User with id ${req.body.userId} not found` });
-    }
+   
 
     // check if the event already exists
     const existingEvent = await Event.findOne({ title, date });
@@ -59,7 +58,7 @@ const createEvent = async (req, res) => {
       date,
       location,
       image,
-      organizer: user.username,
+      organizer,
       attendees: [],
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -123,15 +122,19 @@ const updateEventById = async (req, res) => {
 };
 
 // DELETE an existing event by ID
+
 const deleteEventById = async (req, res) => {
-    const connectedUserId = getConnectedUserId(req); 
+  const connectedUserId = req.body.connectedUserId;
+  console.log(connectedUserId); // Add this line to check the request body
+
 
   try {
     let event = await Event.findById(req.params.id);
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
     }
-    if (event.organizer.toString() !== connectedUserId.toString()) { // check if the current user is the organizer of the event
+    if (event.organizer !== connectedUserId) 
+      { // check if the current user is the organizer of the event
       return res.status(403).json({ message: 'You are not authorized to delete this event' });
     }
     await event.remove();
@@ -141,19 +144,21 @@ const deleteEventById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 // ADD a user as an attendee to an event by ID
 const addAttendeeById = async (req, res) => {
-  const connectedUserId = getConnectedUserId(req);
+  const connectedUserId = req.body.userId;
+  console.log(connectedUserId);
 
   try {
     let event = await Event.findById(req.params.id);
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
     }
-    if (event.attendees.includes(req.body.userId)) { // check if the current user is already an attendee
+    if (event.attendees.includes(connectedUserId)) { // check if the current user is already an attendee
       return res.status(400).json({ message: 'You have already joined this event' });
     }
-    event.attendees.push(req.body.userId); // add the user to the attendees array
+    event.attendees.push(connectedUserId); // add the user to the attendees array
     await event.save();
     res.json(event);
   } catch (error) {
@@ -171,26 +176,34 @@ const addAttendeeById = async (req, res) => {
 
 
 
-    
-    // REMOVE a user as an attendee from an event by ID
-    const removeAttendeeById = async (req, res) => {
-        connectedUserId = getConnectedUserId(req); 
+// REMOVE a user as an attendee from an event by ID
+const removeAttendeeById = async (req, res) => {
+  const connectedUserId = req.body.connectedUserId;
+  console.log(req.body); // Add this line to check the request body
 
-    try {
-    let event = await Event.findById(req.params.id);
+  try {
+    const event = await Event.findById(req.params.id);
     if (!event) {
-    return res.status(404).json({ message: 'Event not found' });
+      return res.status(404).json({ message: 'Event not found' });
     }
-    if (!event.attendees.includes(connectedUserId )) { // check if the current user is not an attendee
-    return res.status(400).json({ message: 'You have not joined this event' });
+    if (!Array.isArray(event.attendees) || event.attendees.length === 0) {
+      return res.status(400).json({ message: 'No attendees found for this event' });
     }
-    event.attendees = event.attendees.filter((attendee) => attendee.toString() !== connectedUserId .toString());
+    console.log('Event attendees:', event.attendees);
+    console.log('Connected user ID:', connectedUserId);
+    if (!event.attendees.includes(connectedUserId)) { // check if the current user is not an attendee
+      return res.status(400).json({ message: 'You have not joined this event' });
+    }
+    const attendees = event.attendees.filter((attendeeId) => attendeeId.toString() !== connectedUserId);
+    event.attendees = attendees;
     event.updatedAt = new Date();
     await event.save();
     res.json(event);
-    } catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
-    }
-    };
+  }
+};
+
+
 module.exports = { getAllEvents, getEventById, createEvent, updateEventById, deleteEventById ,upload,  addAttendeeById, removeAttendeeById };
