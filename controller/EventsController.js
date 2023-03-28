@@ -84,15 +84,16 @@ const createEvent = async (req, res) => {
 
 // UPDATE an existing event by ID
 const updateEventById = async (req, res) => {
-    const connectedUserId = getConnectedUserId(req); 
+  const { title, description, date, location,image} = req.body;
+  const connectedUserId = req.body.connectedUserId;
+  console.log(connectedUserId); // Add this line to check the request body// Add this line to check the request body
 
-  const { title, description, date, location,image } = req.body;
   try {
     let event = await Event.findById(req.params.id);
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
     }
-    if (event.organizer.toString() !== connectedUserId.toString()) { // check if the current user is the organizer of the event
+    if (event.organizer !== connectedUserId) { // check if the current user is the organizer of the event
       return res.status(403).json({ message: 'You are not authorized to update this event' });
     }
     if (req.file) {
@@ -146,15 +147,16 @@ const deleteEventById = async (req, res) => {
 };
 
 // ADD a user as an attendee to an event by ID
+
 const addAttendeeById = async (req, res) => {
   const connectedUserId = req.body.userId;
   console.log(connectedUserId);
-
   try {
     let event = await Event.findById(req.params.id);
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
     }
+  
     if (event.attendees.includes(connectedUserId)) { // check if the current user is already an attendee
       return res.status(400).json({ message: 'You have already joined this event' });
     }
@@ -166,6 +168,9 @@ const addAttendeeById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+
+
 
 
 

@@ -6,6 +6,7 @@ const bodyparser = require("body-parser")
 router.use(express.json())
 router.use(cookieParser())
 const {getAllEvents, getEventById, createEvent, updateEventById, upload,deleteEventById ,  addAttendeeById, removeAttendeeById }= require("../../controller/EventsController")
+const { addCommentById, addReplyToCommentById,getCommentsByEventId}= require("../../controller/CommentEventController")
 
 // GET all events
 router.get('/getAll', getAllEvents);
@@ -26,6 +27,13 @@ router.post('/addAttendees/:id',addAttendeeById);
 
 // REMOVE a user as an attendee from an event by ID
 router.delete('/deleteAttendees/:id', removeAttendeeById);
+
+// ADD a comment to an event by ID
+router.post('/addComment/:id', addCommentById);
+
+// ADD a reply to a comment by ID
+router.post('/addReply/:commentId', addReplyToCommentById);
+router.get('/getComments/:id', getCommentsByEventId);
 
 
 module.exports = router;
