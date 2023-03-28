@@ -48,9 +48,6 @@ async function addlostwithUser(req, res) {
 // GET all pets for the authenticated user
 async function getAllLostsuser(req, res) {
   try { 
-  
-    console.log(req.body.user);
-    
     if (!req.body.user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -59,6 +56,16 @@ async function getAllLostsuser(req, res) {
   } catch (err) {
     console.error(`Error: ${err}`);
     return res.status(500).json({ error: 'Server error' });
+  }
+}
+// get lost by id 
+async function getLostById(req,res){
+  try{
+    
+    const losts = await lost.find({ _id:req.params.id });
+    res.json(losts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 }
 
@@ -71,6 +78,7 @@ async function getAllLost(req, res) {
     res.status(500).json({ message: error.message });
   }
 }
+
 module.exports={
-  addlostwithUser,getAllLost,getAllLostsuser
+  addlostwithUser,getAllLost,getAllLostsuser,getLostById
 }

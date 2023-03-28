@@ -4,6 +4,7 @@ const User = require('../../models/user')
 const bodyparser = require("body-parser")
 const controller=require("../../controller/petContoller")
 const lostcontroller=require("../../controller/LostController")
+const commentcontroller=require("../../controller/CommentLostController")
 const bcrypt = require("bcrypt"); 
 const cookieParser = require("cookie-parser")
 const FormData = require('form-data');
@@ -33,9 +34,11 @@ router.get('/AllpetsByUser',validateToken,controller.getAllpets);
 router.delete('/deletepet/:petId',validateToken,controller.deletepet);
 router.put('/updatepet/:id',validateToken,controller.updatePetwithUser);
  
-
-
-
+router.get('/lostbyid/:id',lostcontroller.getLostById);
+// comments 
+router.post("/addcomments",commentcontroller.addcomment);
+router.get('/comments', commentcontroller.getAllComments);
+router.delete('/deletelost/:id',commentcontroller.deletelost);
 //test django api 
 
 router.post('/predict', upload.single('image'), (req, res) => {   
@@ -54,6 +57,13 @@ router.post('/predict', upload.single('image'), (req, res) => {
       console.log(error);
       res.json({ error: 'Something went wrong.' });
     });
+});
+// get images 
+
+router.get('/image/:id', (req, res) => {
+  const imagePath = `./public/uploads/${req.params.id}`;
+  const imageData = fs.readFileSync(imagePath);
+  res.send(imageData);
 });
  
 module.exports=router;
