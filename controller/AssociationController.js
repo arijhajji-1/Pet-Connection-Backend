@@ -125,8 +125,7 @@ const editAssociation = async (req, res) => {
   }
   
     const { name, user, type, latitude, longitude, bio, date, action } = req.body;
-
-    association.user = user; 
+ 
     association.name = name; 
     association.action = action; 
     association.date = date; 
@@ -135,20 +134,8 @@ const editAssociation = async (req, res) => {
     association.longitude = longitude; 
     association.save(); 
   
-    res.send(association); 
-    // Association.create({
-    //   name: name,
-    //   user: user,
-    //   image: `${req.body.user}${file.filename}`,
-    //   latitude: latitude,
-    //   longitude: longitude,
-    //   bio: bio,
-    //   date: date,
-    //   action: action,
-    // }).then((association) => {
-    //   res.send(association);
-    // });
-  ;
+    res.send(association);  
+  
 };
 
 
