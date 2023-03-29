@@ -85,9 +85,79 @@ const getOneAssociation = async (req, res) => {
 };
 
 
+const getAssociationByUser = async (req, res) => {
+  try {
+    await Association.findOne({ user : req.params.id }).then((result) => {
+      res.send(result);
+    });
+  } catch (err) {
+    res.send(err);
+  }
+};
+
+
+
+const editAssociation = async (req, res) => {
+  var association =  await Association.findById(req.params.id) ; 
+  const file = req.file;
+    if (file) {
+    
+      const oldPath = path.join(__dirname, "..", file.path);
+      const extension = path.extname(file.originalname);
+      const newPath = path.join(
+        __dirname,
+        "..",
+        "public",
+        "associations",
+        `${req.body.user}${file.filename}`
+      );
+
+    // Rename the file to its original name with extension
+      fs.rename(oldPath, newPath, (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ error: "Failed to upload the file" });
+        }
+      })
+      
+      association.image = `${req.body.user}${file.filename}`;
+      
+  }
+  
+    const { name, user, type, latitude, longitude, bio, date, action } = req.body;
+
+    association.user = user; 
+    association.name = name; 
+    association.action = action; 
+    association.date = date; 
+    association.bio = bio; 
+    association.latitude = latitude; 
+    association.longitude = longitude; 
+    association.save(); 
+  
+    res.send(association); 
+    // Association.create({
+    //   name: name,
+    //   user: user,
+    //   image: `${req.body.user}${file.filename}`,
+    //   latitude: latitude,
+    //   longitude: longitude,
+    //   bio: bio,
+    //   date: date,
+    //   action: action,
+    // }).then((association) => {
+    //   res.send(association);
+    // });
+  ;
+};
+
+
+
 module.exports = {
   addAssociation,
   getAllAssociations,
   deleteAssociation,
-  getOneAssociation
+  getOneAssociation,
+  getAssociationByUser,
+  editAssociation,
 }; 
