@@ -12,9 +12,11 @@ const upload = multer({ dest: "public/upgrades/" });
 
 const upgradeUser = (req, res) => {
  
-     const file = req.file;
+    // ======== VERIFICATION FILE ===================================
+
+     const file = req.files["file"][0];
     if (!file) {
-        return res.status(400).json({ error: "Please select a file" });
+        return res.status(400).json({ error: "Please select a file 1" });
     }
     const oldPath = path.join(__dirname, "..", file.path);
     const extension = path.extname(file.originalname);
@@ -28,18 +30,51 @@ const upgradeUser = (req, res) => {
 
     // Rename the file to its original name with extension
     fs.rename(oldPath, newPath, (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Failed to upload the file" });
+      }
+    })
+        
+      
+      // ======== LOGO ===================================
+
+    const logo = req.files["logo"][0];
+    if (!logo) {
+        return res.status(400).json({ error: "Please select a file2" });
+    }
+    const oldPath2 = path.join(__dirname, "..", logo.path);
+    const extension2 = path.extname(logo.originalname);
+    const newPath2 = path.join(
+    __dirname,
+    "..",
+    "public",
+    "upgrades",
+    `logo${req.body.name}${logo.filename}`
+    );
+
+    // Rename the file to its original name with extension
+    fs.rename(oldPath2, newPath2, (err) => {
     if (err) {
         console.error(err);
         return res.status(500).json({ error: "Failed to upload the file" });
     }
-    // res.json({ message: "File uploaded successfully" });
+      
+      
+      
+      
+      
         
-        const { name, user, type } = req.body;
+        const { name, user, type, latitude, longitude, bio } = req.body;
         Upgrade.create({
           name: name,
           user: user,
           file: `${req.body.user}${file.filename}`,
+          logo: `logo${req.body.name}${logo.filename}`,
           type: type,
+          latitude: latitude,
+          longitude: longitude,
+          bio : bio
         }).then((upgrade) => {
           res.send(upgrade);
         });
@@ -93,7 +128,13 @@ const changeType = async (req, res) => {
     }
 
     // Delete user
-    await us.update({ role : req.body.type });
+    await us.update({
+      role: req.body.type,
+      latitude: req.body.latitude,
+      longitude: req.body.longitude,
+      bio: req.body.bio,
+      association : req.body.association
+    });
 
     res.json({ message: "User upgraded to " + req.body.type });
   } catch (error) {
@@ -103,9 +144,22 @@ const changeType = async (req, res) => {
 };
 
 
+const getAllAssociations = async (req, res) => {
+  try {
+    user.find({role : "Association"}).then((result) => {
+      res.send(result);
+    });   
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+
 module.exports = {
   upgradeUser,
   getAllUpgrades,
   deleteUpgrade,
   changeType,
+  getAllAssociations,
 }; 

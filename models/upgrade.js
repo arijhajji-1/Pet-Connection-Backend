@@ -12,13 +12,25 @@ var Upgrade = new schema({
     ref: "User",
     required: true,
   },
+  bio: {
+    type: String,
+  },
   file: {
     type: String,
     required: true,
   },
+  logo: {
+    type: String, 
+  },
   type: {
     type: String,
     required: true,
+  },
+  latitude: {
+    type: Number,
+  },
+  longitude: {
+    type: Number,
   },
 });
  
