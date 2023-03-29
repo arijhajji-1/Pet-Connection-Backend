@@ -4,7 +4,8 @@ const mongo = require('mongoose');
 const mongoconnection = require('./config/mongoconnection.json'); 
 const bodyParser = require("body-parser");
 const cors = require('cors');
-const session = require('express-session')
+const session = require('express-session');
+const {Configuration,OpenAIApi}=require("openai")
 
 // ====== google auth =============
 // require("dotenv").config(); 
@@ -77,4 +78,21 @@ server.listen(3000, () => console.log('server'))
 app.use(express.static('public')); 
 app.use('/uploads', express.static('uploads'));
 var petRouter = require('./routes/Pet/pet'); 
+// endpoint for chatGpt 
+const config=new Configuration({
+  apiKey:"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",
+})
+const openai=new OpenAIApi(config);
+
+app.post("/chat",async(req,res)=>{
+  const {prompt}=req.body;
+  console.log(prompt)
+  const completion =await openai.createCompletion({
+    model:"text-davinci-003",
+    max_tokens:512,
+    temperature:0,
+    prompt:prompt,
+  });
+  res.send(completion.data.choices[0].text); 
+})
 app.use('/pet', petRouter); 

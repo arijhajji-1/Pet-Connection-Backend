@@ -39,6 +39,7 @@ const commentLostSchema = new mongoose.Schema({
   createdAt:{
     type:String
   },
+   
 });
 
 const commentLost = mongoose.model('commentLost', commentLostSchema);
