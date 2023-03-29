@@ -97,8 +97,8 @@ const getAssociationByUser = async (req, res) => {
 
 
 
-const editAssociation = async (req, res) => {
-  var association =  await Association.findById(req.params.id) ; 
+const editAssociation = async (req, res) => { 
+  var image = "";
   const file = req.file;
     if (file) {
     
@@ -120,21 +120,56 @@ const editAssociation = async (req, res) => {
         }
       })
       
-      association.image = `${req.body.user}${file.filename}`;
+      image = `${req.body.user}${file.filename}`;
       
   }
+
+  const { name, latitude, longitude, bio, date, action } = req.body;
+  if (image == "") {
+    await Association.findOneAndUpdate(
+      { _id: req.params.id },
+      {
+        name: name,
+        action: action, 
+        bio: bio,
+        latitude: latitude,
+        longitude: longitude,
+      }
+    ).then((result) => {
+      res.send("association edited");
+    });
+  } else {
+    await Association.findOneAndUpdate(
+      { _id: req.params.id },
+      {
+        name: name,
+        action: action, 
+        bio: bio,
+        latitude: latitude,
+        longitude: longitude,
+        image: `${req.body.user}${file.filename}`,
+      }
+    ).then((result) => {
+      res.send("association edited with image");
+    });
+  }
+    // const association = {
+    //   name = name,
+    //   action = action, 
+    //   date = date,
+    //   bio = bio ,
+    //   latitude = latitude, 
+    //   longitude = longitude,
+    // }
+    // association.name = name; 
+    // association.action = action; 
+    // association.date = date; 
+    // association.bio = bio; 
+    // association.latitude = latitude; 
+    // association.longitude = longitude; 
+    // association.save(); 
   
-    const { name, user, type, latitude, longitude, bio, date, action } = req.body;
- 
-    association.name = name; 
-    association.action = action; 
-    association.date = date; 
-    association.bio = bio; 
-    association.latitude = latitude; 
-    association.longitude = longitude; 
-    association.save(); 
-  
-    res.send(association);  
+    //res.send(association);  
   
 };
 

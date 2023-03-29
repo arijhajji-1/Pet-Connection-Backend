@@ -20,7 +20,7 @@ router.get("/allAssociations",   getAllAssociations);
 router.delete("/delete/:id", deleteAssociation);
 router.get("/getOneAssociation/:id", getOneAssociation);
 router.get("/getAssociationByUser/:id", getAssociationByUser);
-router.put("/editAssociation/:id", editAssociation);
+router.put("/editAssociation/:id", upload.single('file'), editAssociation);
 
 
 
