@@ -2,7 +2,7 @@ const Comment = require('../models/CommentEvent');
 const Event = require ('../models/Events')
 // ADD a comment to an event by ID
 const addCommentById = async (req, res) => {
-  const connectedUserId = req.body.userId;
+  const { text,userId } = req.body;
 
   try {
     let event = await Event.findById(req.params.id);
@@ -10,10 +10,9 @@ const addCommentById = async (req, res) => {
       return res.status(404).json({ message: 'Event not found' });
     }
 
-    const { text } = req.body;
-
+console.log(req.body)
     const newComment = new Comment({
-      user: connectedUserId,
+      user: userId,
       event: event._id,
       text,
     });
@@ -51,19 +50,17 @@ const addReplyToCommentById = async (req, res) => {
     }
   };
  // GET all comments and replies associated with an event by ID
-const getCommentsByEventId = async (req, res) => {
-    try {
-      const eventId = req.params.id;
-  
-      // Find all comments associated with the event
-      const comments = await Comment.find({ event: eventId }).populate('user');
-  
-      // Return the comments with replies populated
-      res.json(comments);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Server error' });
-    }
-  };
+ const getCommentsByEventId = async (req, res) => {
+  try {
+    const eventId = req.params.eventId;
+    const comments = await Comment.find({ event: eventId }).populate('user').populate('event');
+    res.json(comments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
   
   module.exports = { addCommentById, addReplyToCommentById, getCommentsByEventId };

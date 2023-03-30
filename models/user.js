@@ -56,7 +56,7 @@ var User = new schema({
             default: false
         },
         facebookId: String,
-        facebookObjectId: mongoose.Types.ObjectId,     google: {
+        google: {
         type : Boolean
     },
     passwordChangeAt: Date,
@@ -64,12 +64,7 @@ var User = new schema({
     passwordResetExpires: Date,
     isUserVerified: {type: Boolean, default: false},
 });
-User.pre('save', function(next) {
-    if (this.facebookId && !this.facebookObjectId) {
-      this.facebookObjectId = new mongoose.Types.ObjectId(this.facebookId);
-    }
-    next();
-  });
+
 
 //Password reset/forget
 User.methods.createPasswordResetToken = async function () {

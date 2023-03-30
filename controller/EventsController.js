@@ -1,11 +1,22 @@
 const Event = require('../models/Events');
 const { sign, verify } = require('jsonwebtoken')
-const multer = require('multer');
+
 const fs = require('fs');
 const User = require('../models/user');
 const mongoose = require('mongoose');
+const multer = require('multer');
 
-const upload = multer({ dest: 'uploads/' });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/')
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname)
+  }
+})
+
+const upload = multer({ storage: storage })
+
 // GET all events
 const getAllEvents = async (req, res) => {
   try {
@@ -84,31 +95,25 @@ const createEvent = async (req, res) => {
 
 // UPDATE an existing event by ID
 const updateEventById = async (req, res) => {
-  const { title, description, date, location,image} = req.body;
-  const connectedUserId = req.body.connectedUserId;
-  console.log(connectedUserId); // Add this line to check the request body// Add this line to check the request body
+  const { title, description, date, location, image ,organizer } = req.body;
+ 
 
   try {
     let event = await Event.findById(req.params.id);
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
     }
-    if (event.organizer !== connectedUserId) { // check if the current user is the organizer of the event
+    if (event.organizer !== organizer) { // check if the current user is the organizer of the event
       return res.status(403).json({ message: 'You are not authorized to update this event' });
     }
-    if (req.file) {
-      // Remove the old image file
-      if (event.image) {
-        const filepath = `uploads/${event.image}`;
-        fs.unlinkSync(filepath);
-      }
-      // Rename the new file to a unique name to prevent overwriting
+
+    if (req.file && req.file.size > 0) { // check if the file exists and is not empty
       const filename = `${Date.now()}-${req.file.originalname}`;
       const filepath = `uploads/${filename}`;
-      // Move the file to the uploads directory
       fs.renameSync(req.file.path, filepath);
       event.image = filename;
     }
+
     event.title = title;
     event.description = description;
     event.date = date;
@@ -121,6 +126,7 @@ const updateEventById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 // DELETE an existing event by ID
 
