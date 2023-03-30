@@ -14,7 +14,8 @@ const {
     getOneFunding,
     getFundingByAssociation,
     addTotalFunding,
-    deleteFunding
+    deleteFunding,
+    editFunding
 } = require("../../controller/FundingController") ;
 
 
@@ -23,7 +24,8 @@ router.get("/allFunding", getAllFunding);
 router.get("/getOneFunding/:id", getOneFunding); 
 router.get("/getFundingByAssociation/:id", getFundingByAssociation); 
 router.put("/addTotalFunding/:id", addTotalFunding); 
-router.delete("/deleteFunding/:id", deleteFunding); 
+router.delete("/deleteFunding/:id",  deleteFunding); 
+router.put("/editFunding/:id", upload.single("file"),  editFunding); 
 
 
 

@@ -110,6 +110,58 @@ const addTotalFunding = async (req, res) => {
   } catch (err) {
     res.send(err);
   }
+}; 
+
+const editFunding = async(req,res) => {
+  var image = "";
+  const file = req.file;
+  if (file) {
+    const oldPath = path.join(__dirname, "..", file.path);
+    const extension = path.extname(file.originalname);
+    const newPath = path.join(
+      __dirname,
+      "..",
+      "public",
+      "funding",
+      `${req.body.association}${file.filename}`
+    );
+
+    // Rename the file to its original name with extension
+    fs.rename(oldPath, newPath, (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Failed to upload the file" });
+      }
+    });
+
+    image = `${req.body.association}${file.filename}`;
+  }
+
+  const { title, desc, date, association, goal, total } = req.body;
+  if (image == "") {
+    await Funding.findOneAndUpdate(
+      { _id: req.params.id },
+      {
+        title : title, 
+        goal: goal,
+        desc: desc 
+      }
+    ).then((result) => {
+      res.send("funding edited");
+    });
+  } else {
+    await Funding.findOneAndUpdate(
+      { _id: req.params.id },
+      {
+        title : title, 
+        goal: goal,
+        desc: desc ,
+        image: `${req.body.association}${file.filename}`,
+      }
+    ).then((result) => {
+      res.send("funding edited with image");
+    });
+  }
 };
 
 
@@ -130,5 +182,6 @@ module.exports = {
     getOneFunding,
     getFundingByAssociation,
   addTotalFunding,
-    deleteFunding
+  deleteFunding,
+    editFunding
 }; 
