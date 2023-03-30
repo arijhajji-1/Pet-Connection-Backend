@@ -10,46 +10,63 @@ const app = express();
 const upload = multer({ dest: "public/associations/" });
 
 const addFunding = async (req, res) => {
-  const { title, association, total, desc, date } = req.body;
+  const { title, association, desc, goal } = req.body;
   var a = await Association.findById(association);
   a.action = a.action + 1;
   a.save(); 
 
+
+  var image = "";
+
   const file = req.file;
-  if (!file) {
-    return res.status(400).json({ error: "Please select a file" });
+  if (file) {
+     
+      const oldPath = path.join(__dirname, "..", file.path);
+      const extension = path.extname(file.originalname);
+      const newPath = path.join(
+        __dirname,
+        "..",
+        "public",
+        "funding",
+        `${req.body.association}${file.filename}`
+      );
+
+      // Rename the file to its original name with extension
+      fs.rename(oldPath, newPath, (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ error: "Failed to upload the file" });
+        }
+      })
+        image = `${req.body.association}${file.filename}`; 
   }
-  const oldPath = path.join(__dirname, "..", file.path);
-  const extension = path.extname(file.originalname);
-  const newPath = path.join(
-    __dirname,
-    "..",
-    "public",
-    "funding",
-    `${req.body.association}${file.filename}`
-  );
+  
 
-  // Rename the file to its original name with extension
-  fs.rename(oldPath, newPath, (err) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Failed to upload the file" });
-    }
-
-    
-
+  if (image != "") {
     Funding.create({
       title: title,
-      association : association,
+      association: association,
       image: `${req.body.association}${file.filename}`,
-      total: total,
+      total: 0,
       desc: desc,
-      date: date
+      goal : goal,
+      date: new Date()
     }).then((funding) => {
       res.send(funding);
     });
-      
-  });
+  } else {
+    Funding.create({
+      goal: goal,
+      title: title,
+      association: association,
+      total: 0,
+      desc: desc,
+      date: new Date(),
+    }).then((funding) => {
+      res.send(funding);
+    });
+  }    
+   
 };
 
 
@@ -96,11 +113,22 @@ const addTotalFunding = async (req, res) => {
 };
 
 
+const deleteFunding = (req, res) => {
+  try {
+    Funding.findByIdAndDelete(req.params.id).then((result) => {
+      res.send("funding deleted");
+    });
+  } catch (err) {
+    res.send(err);
+  }
+};
+
 
 module.exports = {
     addFunding,
     getAllFunding,
     getOneFunding,
     getFundingByAssociation,
-    addTotalFunding
+  addTotalFunding,
+    deleteFunding
 }; 

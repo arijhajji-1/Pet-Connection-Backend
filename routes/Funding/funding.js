@@ -13,7 +13,8 @@ const {
     getAllFunding,
     getOneFunding,
     getFundingByAssociation,
-    addTotalFunding
+    addTotalFunding,
+    deleteFunding
 } = require("../../controller/FundingController") ;
 
 
@@ -22,6 +23,8 @@ router.get("/allFunding", getAllFunding);
 router.get("/getOneFunding/:id", getOneFunding); 
 router.get("/getFundingByAssociation/:id", getFundingByAssociation); 
 router.put("/addTotalFunding/:id", addTotalFunding); 
+router.delete("/deleteFunding/:id", deleteFunding); 
+
 
 
 

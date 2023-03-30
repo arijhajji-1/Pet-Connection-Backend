@@ -16,14 +16,16 @@ var Funding = new schema({
   },
   image: {
     type: String,
-  }, 
+  },
   total: {
-    type : Number
+    type: Number,
+  },
+  goal: {
+    type: Number,
   },
   date: {
-    type: Date
-  }
-
+    type: Date,
+  },
 });
 
 module.exports = mongo.model("Funding", Funding);
