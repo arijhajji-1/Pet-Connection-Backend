@@ -64,5 +64,72 @@ const getCommentsByEventId = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+// DELETE a comment by ID
+const deleteCommentById = async (req, res) => {
+  const commentId = req.params.commentId;
+  const username = req.body;
+  try {
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
 
-module.exports = { addCommentById, addReplyToCommentById, getCommentsByEventId };
+    if (comment.username !== username.toString()) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    console.log(username)
+
+    await Comment.findByIdAndDelete(commentId);
+    res.json({ message: 'Comment deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// UPDATE a comment by ID
+const updateCommentById = async (req, res) => {
+  const commentId = req.params.commentId;
+  const { text,username } = req.body;
+
+  try {
+    let comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    if (comment.username !== username) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    comment.text = text || comment.text;
+
+    await comment.save();
+    res.json(comment);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+// REPORT a comment by ID
+const reportCommentById = async (req, res) => {
+  const commentId = req.params.commentId;
+
+  try {
+    let comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    comment.reported = true;
+
+    await comment.save();
+    res.json(comment);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+module.exports = { addCommentById, addReplyToCommentById, getCommentsByEventId,reportCommentById,updateCommentById,deleteCommentById };
