@@ -29,11 +29,13 @@ router.post('/addAttendees/:id',addAttendeeById);
 router.delete('/deleteAttendees/:id', removeAttendeeById);
 
 // ADD a comment to an event by ID
-router.post('/addComment/:id', addCommentById);
+router.post('/addComment', addCommentById);
 
 // ADD a reply to a comment by ID
 router.post('/addReply/:commentId', addReplyToCommentById);
-router.get('/getComments/:id', getCommentsByEventId);
+
+// GET all comments and replies associated with an event by ID
+router.get('/getCommentsEvent/:eventId', getCommentsByEventId);
 
 
 module.exports = router;

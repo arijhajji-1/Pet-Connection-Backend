@@ -731,7 +731,7 @@ const getUserImage = async (req, res) => {
     } else {
       user = await User.findOne({ facebookId: req.params.id });
     }
-
+console.log(user)
       if (!user) {
           return res.status(404).json({ message: 'User not found' });
       }
