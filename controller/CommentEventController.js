@@ -28,12 +28,20 @@ console.log(req.body)
   }
 };
 
-// ADD a reply to a comment by ID
 const addReplyToCommentById = async (req, res) => {
-  const { commentId, text, image, username } = req.body;
+  const {  text, image, username } = req.body;
+  const commentId = req.params.commentId;
+
+  console.log('commentId:', commentId);
+  console.log('text:', text);
+  console.log('image:', image);
+  console.log('username:', username);
 
   try {
     let comment = await Comment.findById(commentId);
+
+    console.log('comment:', comment);
+
     if (!comment) {
       return res.status(404).json({ message: 'Comment not found' });
     }
@@ -44,6 +52,8 @@ const addReplyToCommentById = async (req, res) => {
       username
     };
 
+    console.log('newReply:', newReply);
+
     comment.replies.push(newReply);
     await comment.save();
     res.json(comment);
@@ -52,6 +62,7 @@ const addReplyToCommentById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 // GET all comments and replies associated with an event by ID
 const getCommentsByEventId = async (req, res) => {
@@ -67,7 +78,7 @@ const getCommentsByEventId = async (req, res) => {
 // DELETE a comment by ID
 const deleteCommentById = async (req, res) => {
   const commentId = req.params.commentId;
-  const username = req.body;
+  const { username } = req.body; // <-- Get username from req.body
   try {
     const comment = await Comment.findById(commentId);
     if (!comment) {
@@ -87,22 +98,31 @@ const deleteCommentById = async (req, res) => {
   }
 };
 
+
 // UPDATE a comment by ID
 const updateCommentById = async (req, res) => {
   const commentId = req.params.commentId;
-  const { text,username } = req.body;
+  const { text, username } = req.body;
+
+  if (!text) {
+    return res.status(400).json({ message: 'Text is required' });
+  }
+
+  if (!username) {
+    return res.status(400).json({ message: 'Username is required' });
+  }
 
   try {
-    let comment = await Comment.findById(commentId);
+    const comment = await Comment.findById(commentId);
     if (!comment) {
       return res.status(404).json({ message: 'Comment not found' });
     }
 
-    if (comment.username !== username) {
-      return res.status(401).json({ message: 'Unauthorized' });
+    if (comment.username !== username.toString()) {
+      return res.status(401).json({ message: 'You are not authorized to update this comment' });
     }
 
-    comment.text = text || comment.text;
+    comment.text = text;
 
     await comment.save();
     res.json(comment);
