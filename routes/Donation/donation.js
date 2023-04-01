@@ -12,13 +12,15 @@ const {
     addDonation,
     getAllDonation,
     getDonationsByFunding,
-    deleteDonation
+    deleteDonation,
+    getRanking
 } = require("../../controller/DonationController");
 
 router.post("/addDonation", addDonation); 
 router.get("/getAllDonation", getAllDonation); 
 router.get("/getDonationsByFunding/:id", getDonationsByFunding); 
 router.delete("/deleteDonation/:id", deleteDonation); 
+router.get("/getRanking", getRanking); 
 
 
 
