@@ -40,8 +40,16 @@ const commentSchema = new mongoose.Schema(
           default: Date.now
         }
       }
-    ]
-  },
+    ],
+  
+  reportedBy: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    }
+  ]
+},
   { timestamps: true }
 );
 

@@ -1,5 +1,6 @@
 const Comment = require('../models/commentEvent');
 const Event = require('../models/Events');
+
 const mongoose = require('mongoose');
 
 // ADD a comment to an event by ID
@@ -133,9 +134,12 @@ const updateCommentById = async (req, res) => {
 };
 
 
+
+
 // REPORT a comment by ID
 const reportCommentById = async (req, res) => {
   const commentId = req.params.commentId;
+  const userId = req.body.userId;
 
   try {
     let comment = await Comment.findById(commentId);
@@ -143,7 +147,17 @@ const reportCommentById = async (req, res) => {
       return res.status(404).json({ message: 'Comment not found' });
     }
 
-    comment.reported = true;
+    if (comment.reportedBy.includes(userId)) {
+      return res.status(400).json({ message: 'You have already reported this comment' });
+    }
+
+    comment.reportedBy.push(userId);
+
+    if (comment.reportedBy.length >= 3) {
+      await Comment.findByIdAndDelete(comment._id);
+      return res.json({ message: 'Comment deleted successfully' });
+    }
+
 
     await comment.save();
     res.json(comment);
@@ -152,4 +166,53 @@ const reportCommentById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-module.exports = { addCommentById, addReplyToCommentById, getCommentsByEventId,reportCommentById,updateCommentById,deleteCommentById };
+const handleEditReply = async (commentId, replyId, text, username) => {
+  try {
+    let comment = await Comment.findById(commentId);
+    if (!comment) {
+      throw new Error('Comment not found');
+    }
+
+    let reply = comment.replies.id(replyId);
+    if (!reply) {
+      throw new Error('Reply not found');
+    }
+
+    if (reply.username !== username) {
+      throw new Error('You are not authorized to edit this reply');
+    }
+
+    reply.text = text;
+
+    await comment.save();
+    console.log('Reply updated successfully');
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
+const handleDeleteReply = async (commentId, replyId, username) => {
+  try {
+    let comment = await Comment.findById(commentId);
+    if (!comment) {
+      throw new Error('Comment not found');
+    }
+
+    let reply = comment.replies.id(replyId);
+    if (!reply) {
+      throw new Error('Reply not found');
+    }
+
+    if (reply.username !== username) {
+      throw new Error('You are not authorized to delete this reply');
+    }
+
+    reply.remove();
+
+    await comment.save();
+    console.log('Reply deleted successfully');
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+module.exports = { addCommentById, addReplyToCommentById, getCommentsByEventId,reportCommentById,updateCommentById,deleteCommentById ,handleEditReply,handleDeleteReply};

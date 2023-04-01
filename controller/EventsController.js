@@ -73,6 +73,7 @@ const createEvent = async (req, res) => {
       attendees: [],
       createdAt: new Date(),
       updatedAt: new Date(),
+      attendeesCount:0
     });
 
     if (req.file) {
@@ -156,7 +157,7 @@ const deleteEventById = async (req, res) => {
 
 const addAttendeeById = async (req, res) => {
   const connectedUserId = req.body.userId;
-  console.log(connectedUserId);
+  console.log(connectedUserId ,"joined");
   try {
     let event = await Event.findById(req.params.id);
     if (!event) {
@@ -167,6 +168,7 @@ const addAttendeeById = async (req, res) => {
       return res.status(400).json({ message: 'You have already joined this event' });
     }
     event.attendees.push(connectedUserId); // add the user to the attendees array
+    event.attendeesCount++; // increment the attendeeCount attribute
     await event.save();
     res.json(event);
   } catch (error) {
@@ -174,8 +176,6 @@ const addAttendeeById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
-
 
 
 
@@ -208,6 +208,8 @@ const removeAttendeeById = async (req, res) => {
     const attendees = event.attendees.filter((attendeeId) => attendeeId.toString() !== connectedUserId);
     event.attendees = attendees;
     event.updatedAt = new Date();
+    event.attendeesCount--; // decrement the attendeeCount attribute
+
     await event.save();
     res.json(event);
   } catch (error) {
