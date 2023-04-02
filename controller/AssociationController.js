@@ -177,6 +177,29 @@ const editAssociation = async (req, res) => {
 };
 
 
+const upgradeToAssociation = async (req, res) => {
+  var u = await user.findById(req.body.user);
+  u.role = "Association";
+  u.save();
+ 
+
+    const { name, user, latitude, longitude, bio, date, action , file} =
+      req.body;
+    Association.create({
+      name: name,
+      user: user,
+      image: file ,
+      latitude: latitude,
+      longitude: longitude,
+      bio: bio,
+      date: new Date(),
+      action: action,
+    }).then((association) => {
+      res.send(association);
+    });
+   
+};
+
 
 module.exports = {
   addAssociation,
@@ -185,4 +208,5 @@ module.exports = {
   getOneAssociation,
   getAssociationByUser,
   editAssociation,
+  upgradeToAssociation
 }; 
