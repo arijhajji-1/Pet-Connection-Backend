@@ -8,7 +8,11 @@ const user = require("../models/user");
 const app = express();
 const upload = multer({ dest: "public/associations/" });
 
-const addAssociation = (req, res) => {
+const addAssociation = async (req, res) => {
+  var u = await user.findById(req.body.user);
+  u.role = "Association";
+  u.save(); 
+
    const file = req.file;
    if (!file) {
      return res.status(400).json({ error: "Please select a file" });
@@ -30,8 +34,7 @@ const addAssociation = (req, res) => {
        return res.status(500).json({ error: "Failed to upload the file" });
      }
      
-       
-       
+      
        
      const { name, user, type, latitude, longitude, bio, date,action } = req.body;
      Association.create({
