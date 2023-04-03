@@ -4,6 +4,8 @@ const path = require("path");
 const fs = require("fs");
 const Association = require("../models/association");
 const user = require("../models/user");
+const UserMod = require("../models/user");
+
 
 const app = express();
 const upload = multer({ dest: "public/associations/" });
@@ -178,7 +180,8 @@ const editAssociation = async (req, res) => {
 
 
 const upgradeToAssociation = async (req, res) => {
-  var u = await user.findById(req.body.user);
+  var u = await UserMod.findById(req.body.user);
+  console.log(req.body.user); 
   u.role = "Association";
   u.save();
  
@@ -195,6 +198,8 @@ const upgradeToAssociation = async (req, res) => {
       date: new Date(),
       action: action,
     }).then((association) => {
+
+      
       res.send(association);
     });
    
