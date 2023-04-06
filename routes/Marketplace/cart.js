@@ -17,10 +17,11 @@ router.delete("/deleteCart/:id",cartController.deleteCart);
 router.get("/getCartById/:userId",validateToken,cartController.getCartById);
 router.get("/getAll",validateToken,cartController.getAll);
 
+router.post("/addproducttocart/:id",cartController.addProductToCart);
 
-
-
-
+router.post("/getCartProductsByUser",cartController.getCartProductsByUser);
+router.post('/deletecart2/:id', cartController.deleteProductFromCart);
+router.post('/subtractFromCart/:id', cartController.subtractFromCart);
 const { sign, verify } = require('jsonwebtoken')
 
 

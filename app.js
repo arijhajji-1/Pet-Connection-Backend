@@ -2,29 +2,33 @@ const express = require('express');
 const http = require('http')
 const mongo = require('mongoose'); 
 const mongoconnection = require('./config/mongoconnection.json'); 
-const bodyParser = require("body-parser")
-
+const bodyParser = require("body-parser");
+const cors = require('cors');
+const session = require('express-session')
+const path = require("path");
+ 
 
 // =========== Database Connection ==============
-/*mongo.connect(mongoconnection.url, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-}).then(() => {
-    console.log("DataBase Connected");
-}).catch((err) => {
-    console.log(err);
-});*/
 mongo.connect("mongodb+srv://yosramekaoui:yosra@cluster0.aalwf4q.mongodb.net/ace?retryWrites=true&w=majority"
 ).then(()=>console.log("Db Connect")).catch((err)=>{
     console.log(err);
 });
 
 
+
 // ============= configuration express ================
 var app = express();
+app.set("views" , path.join(__dirname, "views"));
+app.set("view engine", "twig");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
+app.use(cors());
+app.use(session({
+  secret: 'azjdn1dkd3ad', // Set a secret key for session encryption
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // Set to true if using HTTPS
+}));
 
 
 // ============ routes =================
@@ -33,20 +37,23 @@ app.use('/user', useRouter);
 
 
 var productRouter = require('./routes/Marketplace/product'); 
-const { default: mongoose } = require('mongoose');
-app.use('/', productRouter); 
+app.use('/product', productRouter);
 var cartRouter = require('./routes/Marketplace/cart'); 
 app.use('/', cartRouter);
 var orderRouter = require('./routes/Marketplace/order'); 
 app.use('/', orderRouter);
+app.use(express.static('public'));
+
+
+
 
 
 
  
 
-
-
-
 // ========= server creation =============
 const server = http.createServer(app); 
 server.listen(3000, () => console.log('server'))
+
+  
+//================//
