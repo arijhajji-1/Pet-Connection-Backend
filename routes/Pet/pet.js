@@ -30,17 +30,18 @@ router.post("/addpetwithUser",upload.array("images"),controller.addPetwithUser);
 router.post("/addlost",upload.array("image"),lostcontroller.addlostwithUser);
 router.get("/getAllLostAndFound" ,lostcontroller.getAllLost);
 router.post("/getAllLostAndFounduser" ,lostcontroller.getAllLostsuser);
-router.get('/AllpetsByUser',validateToken,controller.getAllpets);
-router.delete('/deletepet/:petId',validateToken,controller.deletepet);
-router.put('/updatepet/:id',validateToken,controller.updatePetwithUser);
- 
+router.post('/AllpetsByUser',controller.getAllpets);
+router.delete('/deletepet/:id',controller.deletepet);
+router.put('/updatepet/:id',controller.updatePetwithUser);
+router.delete('/deletelostbuid/:id',lostcontroller.deleteLostById);
 router.get('/lostbyid/:id',lostcontroller.getLostById);
+router.delete('/deletelost/:id',commentcontroller.deletelost);
+router.put('/updatelost/:id',lostcontroller.updatelost);
 // comments 
 router.post("/addcomments",commentcontroller.addcomment);
 router.get('/comments', commentcontroller.getAllComments);
-router.delete('/deletelost/:id',commentcontroller.deletelost);
-//test django api 
 
+//test django api 
 router.post('/predict', upload.single('image'), (req, res) => {   
   const form = new FormData();
   form.append('image', fs.createReadStream(req.file.path), req.file.filename);
@@ -59,6 +60,7 @@ router.post('/predict', upload.single('image'), (req, res) => {
     });
 });
 // get images 
+
 
 router.get('/image/:id', (req, res) => {
   const imagePath = `./public/uploads/${req.params.id}`;

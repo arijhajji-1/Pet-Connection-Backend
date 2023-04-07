@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const axios = require('axios');
 const FormData = require('form-data');
+const user = require('../models/user');
 
 //add lost or found pet 
 async function addlostwithUser(req, res) {
@@ -78,7 +79,75 @@ async function getAllLost(req, res) {
     res.status(500).json({ message: error.message });
   }
 }
+//notificaion 
+async function popNotification(req,req){
+  if(req.body.user._id){
+    user.findById(req.body.user._id,(err,user)=>{
+      if(err){
+        res.json(err);
+      }
+      else{
+        let notification=user.notification;
+        let blank=[];
+        user.notification=blank;
+        user.save();
+        res.json(notification);
+      }
+    })
+
+  }else{
+    res.json("No user provided")
+  }
+}
+//delete lost 
+ 
+async function deleteLostById(req, res) {
+  try {
+    const lostId = req.params.id; // get the lost pet ID from the request parameters
+
+    // Check if the lost pet exists
+    const lostPet = await lost.findById(lostId);
+    if (!lostPet) {
+      return res.status(404).json({ error: 'Lost pet not found' });
+    }
+
+    // Delete the lost pet
+    await lost.findByIdAndDelete(lostId);
+    // const userId = lostPet.user;
+    // const user = await User.findById(userId);
+    // if (user) {
+    //   user.losts.pull(lostId);
+    //   await user.save();
+    // }
+
+    return res.status(200).json({ message: 'Lost pet deleted successfully' });
+  } catch (error) {
+    console.error(`Error: ${error}`);
+    return res.status(500).json({ error: 'Server error' });
+  }
+}
+// update 
+async function updatelost(req, res)  {
+  try {
+    // Find the lost pet by ID
+    const lostPet = await lost.findById(req.params.id);
+
+    // Update the lost pet with new data from request body
+    lostPet.description = req.body.description;
+    lostPet.location = req.body.location;
+    lostPet.color = req.body.color;
+    lostPet.breed = req.body.breed;
+    // Save the updated lost pet to the database
+    const updatedLostPet = await lostPet.save();
+
+    // Send the updated lost pet as response
+    res.json(updatedLostPet);
+  } catch (error) {
+    // Handle error and send error response
+    res.status(500).json({ error: 'Failed to update lost pet' });
+  }
+};
 
 module.exports={
   addlostwithUser,getAllLost,getAllLostsuser,getLostById
-}
+,deleteLostById,updatelost}

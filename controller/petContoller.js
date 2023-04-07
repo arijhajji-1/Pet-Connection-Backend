@@ -29,32 +29,24 @@ async function addPet(req, res, next) {
     }
   }
   // GET all pets for the authenticated user
- async function getAllpets(req, res)  {
+  async function getAllpets(req, res) {
     try {
-      
-        const accessToken = req.cookies["access-token"];
-
-        if (!accessToken) {
-          return res.status(401).json({ message: "Access token not found" });
-        }
-       
-          const decodedToken = verify(accessToken, "azjdn1dkd3ad");
-           
-          req.userId = decodedToken.id;
-    
-          const user = await User.findById(req.userId );
-     
+      const userId = req.body.user1._id; // Get the user ID from the request body
+      const user = await User.findById(userId);
+  
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
-      } 
-      const pets = await pet.find({ user: req.userId  });
-       
+      }
+  
+      const pets = await pet.find({ user: user._id }); // Find pets with matching user ID
+  
       return res.json(pets);
     } catch (err) {
       console.error(`Error: ${err}`);
       return res.status(500).json({ error: 'Server error' });
     }
   }
+  
 // POST a new pet for a user
  
    
@@ -62,9 +54,7 @@ async function addPet(req, res, next) {
     //=================================================================================================================================test
     async function addPetwithUser (req, res)  {
         // Create a new pet document and add it to the   user's pets array
-       const user = JSON.parse(req.body.user);
-      console.log(req.body.images)
-         
+       const user = JSON.parse(req.body.user);     
        const user1 = await User.findById(user._id);
        
   // Make a request to the prediction API using the first image in the array
@@ -105,24 +95,16 @@ async function addPet(req, res, next) {
 async function deletepet(req, res) {
   try{
   //get user 
-  const accessToken = req.cookies["access-token"];
-
-  if (!accessToken) {
-    return res.status(401).json({ message: "Access token not found" });
-  }
- 
-    const decodedToken = verify(accessToken, "azjdn1dkd3ad");
-     
-    req.userId = decodedToken.id;
-
-    const user = await User.findById(req.userId );
-  // Find the pet to be removed
+  const user = JSON.parse(req.body.user);     
+  const user1 = await User.findById(user._id);
+  
+   // Find the pet to be removed
   const Pet = await pet.findById(req.params.petId);
   if (!Pet) {
       return res.status(404).json({ error: 'Pet not found' });
     }
   // Remove the pet from the database
-  if(user.pets.pop()){
+  if(user1.pets.pop()){
     await Pet.remove();
   }
    
@@ -142,31 +124,21 @@ catch (error) {
 // update pet from user 
 async function updatePetwithUser (req, res)  {
     
-  const accessToken = req.cookies["access-token"];
-
-  if (!accessToken) {
-    return res.status(401).json({ message: "Access token not found" });
-  }
- 
-    const decodedToken = verify(accessToken, "azjdn1dkd3ad");
-     
-    req.userId = decodedToken.id;
-const user = await User.findById(req.userId );
-
+  const user = JSON.parse(req.body.user);     
+  const user1 = await User.findById(user._id);
+  
 
   // Create a new pet document and add it to the user's pets array
   const Pet = new pet({
     name: req.body.name,
     color: req.body.color,
     breed: req.body.breed,
-    age: req.body.age,
     categoryPet: req.body.categoryPet,
-    user: user,
-    images: req.files.map((file) => file.filename),
+     
   });
   await Pet.findByIdAndupdate(req.params.id,req.body,{new:true});
-  user.pets.push(Pet._id);
-  await user.save();
+  user1.pets.push(Pet._id);
+  await user1.save();
 
   res.status(201).json({ message: 'Pet updated  successfully' });
 

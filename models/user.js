@@ -74,7 +74,10 @@ var User = new schema({
           type: schema.Types.ObjectId,
           ref: 'lost'
         }
-      ]  
+      ]  ,
+      notification:{
+        type:Array
+      }
       
 });
 

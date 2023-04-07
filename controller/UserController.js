@@ -172,6 +172,7 @@ const profile = async (req, res) => {
         res.send(err)
     }
 }
+
 const addUser = async (req, res) => {
   try {
       const { username, password, name, email, image, role, location, phone } = req.body;

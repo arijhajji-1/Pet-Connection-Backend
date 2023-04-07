@@ -6,7 +6,10 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const axios = require('axios');
 const FormData = require('form-data');
+const user = require('../models/user');
  
+
+
 
 // add comment to Lost posts user
 async function addcomment(req, res, next){
@@ -23,8 +26,10 @@ async function addcomment(req, res, next){
          Comment.save((err, data) => {
             if (err) {  
               console.log(err.stack);
-               
-            }
+              //  const userr=user.findById(req.body.userId);
+              //  userr.notification.push("you have a new comment on post ");
+              
+              }
            
             return res.json(data);
         });
