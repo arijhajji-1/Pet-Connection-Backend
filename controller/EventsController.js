@@ -49,14 +49,9 @@ const getConnectedUserId = (req) => {
 
 
 const createEvent = async (req, res) => {
-  let { title, description, date, location, image ,organizer} = req.body;
- // Add this line to check the request body
+  let { title, description, date, location, image, organizer, organizerPic } = req.body;
 
   try {
-    // Check if user exists
-   
-
-    // check if the event already exists
     const existingEvent = await Event.findOne({ title, date });
 
     if (existingEvent) {
@@ -73,7 +68,8 @@ const createEvent = async (req, res) => {
       attendees: [],
       createdAt: new Date(),
       updatedAt: new Date(),
-      attendeesCount:0
+      attendeesCount: 0,
+      organizerPic
     });
 
     if (req.file) {
@@ -81,6 +77,13 @@ const createEvent = async (req, res) => {
       const filepath = `uploads/${filename}`;
       fs.renameSync(req.file.path, filepath);
       newEvent.image = filename;
+    }
+
+    if (req.file && req.file.fieldname === 'organizerPic') {
+      const organizerPicFilename = `${Date.now()}-${req.file.originalname}`;
+      const organizerPicFilepath = `uploads/${organizerPicFilename}`;
+      fs.renameSync(req.file.path, organizerPicFilepath);
+      newEvent.organizerPic = organizerPicFilename;
     }
 
     await newEvent.save();
@@ -92,11 +95,13 @@ const createEvent = async (req, res) => {
 };
 
 
+
+
   
 
 // UPDATE an existing event by ID
 const updateEventById = async (req, res) => {
-  const { title, description, date, location, image ,organizer } = req.body;
+  const { title, description, date, location, image ,organizer ,organizerPic } = req.body;
  
 
   try {
@@ -113,6 +118,7 @@ const updateEventById = async (req, res) => {
       const filepath = `uploads/${filename}`;
       fs.renameSync(req.file.path, filepath);
       event.image = filename;
+      event.organizerPic = filename
     }
 
     event.title = title;

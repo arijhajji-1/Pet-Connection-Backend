@@ -35,6 +35,10 @@ const eventSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
+      organizerPic: {
+        type: String, // add a new field for the organizer's profile picture
+        required: true,
+      },
   attendees: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
