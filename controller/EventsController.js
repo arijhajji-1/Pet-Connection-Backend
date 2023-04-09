@@ -97,12 +97,12 @@ const createEvent = async (req, res) => {
 
 
 
-  
+
 
 // UPDATE an existing event by ID
 const updateEventById = async (req, res) => {
-  const { title, description, date, location, image ,organizer ,organizerPic } = req.body;
- 
+  const { title, description, date, location, image, organizer, organizerPic } = req.body;
+
 
   try {
     let event = await Event.findById(req.params.id);
@@ -147,8 +147,7 @@ const deleteEventById = async (req, res) => {
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
     }
-    if (event.organizer !== connectedUserId) 
-      { // check if the current user is the organizer of the event
+    if (event.organizer !== connectedUserId) { // check if the current user is the organizer of the event
       return res.status(403).json({ message: 'You are not authorized to delete this event' });
     }
     await event.remove();
@@ -163,13 +162,13 @@ const deleteEventById = async (req, res) => {
 
 const addAttendeeById = async (req, res) => {
   const connectedUserId = req.body.userId;
-  console.log(connectedUserId ,"joined");
+  console.log(connectedUserId, "joined");
   try {
     let event = await Event.findById(req.params.id);
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
     }
-  
+
     if (event.attendees.includes(connectedUserId)) { // check if the current user is already an attendee
       return res.status(400).json({ message: 'You have already joined this event' });
     }
@@ -182,15 +181,6 @@ const addAttendeeById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
-
-
-
-
-
-
-
-
 
 
 // REMOVE a user as an attendee from an event by ID
@@ -223,6 +213,67 @@ const removeAttendeeById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+const LikeEvent = async (req, res) => {
+  const { eventId } = req.params;
+  const { userId } = req.body;
+
+  try {
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // Check if the user has already liked the event
+    if (!event.Like.includes(userId)) {
+      event.Like.push(userId);
+      await event.save();
+      res.status(200).json({ event: { Like: event.Like } });
+    } else {
+      return res.status(400).json({ message: 'You have already liked this event' });
+    }
 
 
-module.exports = { getAllEvents, getEventById, createEvent, updateEventById, deleteEventById ,upload,  addAttendeeById, removeAttendeeById };
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error updating event likes' });
+  }
+};
+
+
+
+const dislikeEvent = async (req, res) => {
+  const { eventId } = req.params;
+  const { userId } = req.body;
+
+  try {
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // Check if the user has already disliked the event
+    if (event.Like.includes(userId)) {
+      event.Like = event.Like.filter((likeUserId) => likeUserId.toString() !== userId);
+      await event.save();
+      res.status(200).json({ event: { Like: event.Like } });
+    } else {
+      return res.status(400).json({ message: 'You have not liked this event yet' });
+    }
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error updating event likes' });
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+module.exports = { getAllEvents, getEventById, createEvent, updateEventById, deleteEventById, upload, addAttendeeById, removeAttendeeById, LikeEvent, dislikeEvent };

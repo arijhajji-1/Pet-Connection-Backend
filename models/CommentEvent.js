@@ -38,7 +38,13 @@ const commentSchema = new mongoose.Schema(
         createdAt: {
           type: Date,
           default: Date.now
-        }
+        },
+        
+  Like :
+  {
+    type: Number,
+    default: 0,
+  }
       }
     ],
   
@@ -48,7 +54,13 @@ const commentSchema = new mongoose.Schema(
       ref: 'User',
       required: true
     }
-  ]
+  ],
+  
+  Like :
+  {
+    type: Number,
+    default: 0,
+  }
 },
   { timestamps: true }
 );
