@@ -15,7 +15,8 @@ const {
     getFundingByAssociation,
     addTotalFunding,
     deleteFunding,
-    editFunding
+    editFunding,
+    avatar
 } = require("../../controller/FundingController") ;
 
 
@@ -28,7 +29,7 @@ router.delete("/deleteFunding/:id",  deleteFunding);
 router.put("/editFunding/:id", upload.single("file"),  editFunding); 
 
 
-
+router.post("/avatar", avatar);
 
 
 module.exports = router; 

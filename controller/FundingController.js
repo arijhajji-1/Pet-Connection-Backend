@@ -8,6 +8,7 @@ const user = require("../models/user");
 
 const app = express();
 const upload = multer({ dest: "public/associations/" });
+const fetch = require("node-fetch");
 
 const addFunding = async (req, res) => {
   const { title, association, desc, goal } = req.body;
@@ -176,6 +177,43 @@ const deleteFunding = (req, res) => {
 };
 
 
+
+
+const avatar = async (req, res) => {
+  const url = "https://stablediffusionapi.com/api/v3/img2img";
+  const data = {
+    key: "7aQiher7boW6w073KLcyTbLygri76F56J4kMT1LUXfDGGRNpaHoCFaiAEieT",
+    prompt: "make avatar of my pet",
+    negative_prompt: null,
+    init_image:
+      "https://i.insider.com/5c20d8ee01c0ea245970caa3?width=1000&format=jpeg&auto=webp",
+    width: "512",
+    height: "512",
+    samples: "1",
+    num_inference_steps: "30",
+    guidance_scale: 7.5,
+    safety_checker: "yes",
+    strength: 0.7,
+    seed: null,
+    webhook: null,
+    track_id: null,
+  };
+
+  const options = {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  fetch(url, options)
+    .then((response) => response.json())
+    .then((data) => res.send(data))
+    .catch((error) => console.error(error));
+}; 
+
+
 module.exports = {
     addFunding,
     getAllFunding,
@@ -183,5 +221,6 @@ module.exports = {
     getFundingByAssociation,
   addTotalFunding,
   deleteFunding,
-    editFunding
+  editFunding,
+    avatar
 }; 
