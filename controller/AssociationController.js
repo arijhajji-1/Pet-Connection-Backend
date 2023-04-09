@@ -5,6 +5,7 @@ const fs = require("fs");
 const Association = require("../models/association");
 const user = require("../models/user");
 const UserMod = require("../models/user");
+const upgrade = require("../models/upgrade");
 
 
 const app = express();
@@ -180,10 +181,15 @@ const editAssociation = async (req, res) => {
 
 
 const upgradeToAssociation = async (req, res) => {
-  var u = await UserMod.findById(req.body.user);
-  console.log(req.body.user); 
-  u.role = "Association";
-  u.save();
+
+  await upgrade.findByIdAndDelete(req.body.upgrade);
+
+  var u = await UserMod.findById(req.body.user).then((result) => {
+    console.log("user = " + result);
+    result.role = "Association";
+    result.save();  
+  });
+  
  
 
     const { name, user, latitude, longitude, bio, date, action , file} =
@@ -191,15 +197,13 @@ const upgradeToAssociation = async (req, res) => {
     Association.create({
       name: name,
       user: user,
-      image: file ,
+      image: file,
       latitude: latitude,
       longitude: longitude,
       bio: bio,
       date: new Date(),
       action: action,
     }).then((association) => {
-
-      
       res.send(association);
     });
    

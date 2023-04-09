@@ -92,8 +92,8 @@ router.post("/upgrade", upload.fields([
 
   
 router.get("/AllUpgrades", getAllUpgrades); 
-router.delete("/deleteUpgrade/:id", validateToken, deleteUpgrade); 
-router.put("/changeType/:id", validateToken, changeType); 
+router.delete("/deleteUpgrade/:id", deleteUpgrade); 
+router.put("/changeType/:id",  changeType); 
 router.get("/getAllAssociations", getAllAssociations); 
 
 
