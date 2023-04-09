@@ -180,13 +180,15 @@ const deleteFunding = (req, res) => {
 
 
 const avatar = async (req, res) => {
+  const img = req.body.img; 
+  console.log(img); 
   const url = "https://stablediffusionapi.com/api/v3/img2img";
   const data = {
-    key: "7aQiher7boW6w073KLcyTbLygri76F56J4kMT1LUXfDGGRNpaHoCFaiAEieT",
+    key: "l1UqBXYfTI0Mf0xJtt05VlWXvUls2PiEoGIqdgOehDGetWtJYEIeFHHcsFZ3",
     prompt: "make avatar of my pet",
     negative_prompt: null,
     init_image:
-      "https://i.insider.com/5c20d8ee01c0ea245970caa3?width=1000&format=jpeg&auto=webp",
+      "https://images.unsplash.com/photo-1611003228941-98852ba62227?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YmFieSUyMGRvZ3xlbnwwfHwwfHw%3D&w=1000&q=80",
     width: "512",
     height: "512",
     samples: "1",
