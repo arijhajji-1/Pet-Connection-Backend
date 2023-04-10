@@ -7,7 +7,7 @@ const petSchema = new mongoose.Schema({
   },
   color: {
     type: String,
-    enum: ['black', 'white', 'brown', 'gray', 'other'],
+ 
     //required: true
   },
   breed: {
@@ -17,7 +17,7 @@ const petSchema = new mongoose.Schema({
  
   categoryPet: {
     type: String,
-    enum: ['dog', 'cat', 'bird', 'reptile', 'other'],
+   
    // required: true
   },
 // relation user pet 

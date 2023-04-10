@@ -100,7 +100,6 @@ async function popNotification(req,req){
   }
 }
 //delete lost 
- 
 async function deleteLostById(req, res) {
   try {
     const lostId = req.params.id; // get the lost pet ID from the request parameters
@@ -110,8 +109,7 @@ async function deleteLostById(req, res) {
     if (!lostPet) {
       return res.status(404).json({ error: 'Lost pet not found' });
     }
-
-    // Delete the lost pet
+// Delete the lost pet
     await lost.findByIdAndDelete(lostId);
     // const userId = lostPet.user;
     // const user = await User.findById(userId);
@@ -119,13 +117,14 @@ async function deleteLostById(req, res) {
     //   user.losts.pull(lostId);
     //   await user.save();
     // }
-
+  
     return res.status(200).json({ message: 'Lost pet deleted successfully' });
   } catch (error) {
     console.error(`Error: ${error}`);
     return res.status(500).json({ error: 'Server error' });
   }
 }
+
 // update 
 async function updatelost(req, res)  {
   try {
@@ -137,6 +136,8 @@ async function updatelost(req, res)  {
     lostPet.location = req.body.location;
     lostPet.color = req.body.color;
     lostPet.breed = req.body.breed;
+    lostPet.type = req.body.type;
+    
     // Save the updated lost pet to the database
     const updatedLostPet = await lostPet.save();
 

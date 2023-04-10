@@ -40,7 +40,10 @@ router.put('/updatelost/:id',lostcontroller.updatelost);
 // comments 
 router.post("/addcomments",commentcontroller.addcomment);
 router.get('/comments', commentcontroller.getAllComments);
-
+// adminn===========
+router.get("/getallpets",controller.getAllPetsAdmin);
+router.put("/updatepet",controller.updatePetAdmin);
+router.delete("/deletepetadmin/:id",controller.deletepetAdmin);
 //test django api 
 router.post('/predict', upload.single('image'), (req, res) => {   
   const form = new FormData();
