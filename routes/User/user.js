@@ -11,11 +11,13 @@ const passport = require("passport");
 
 const { createToken, validateToken } = require('../../midill/JWT/JWT'); 
 
+
 const { register, login, profile, getAll, updateUser, deleteUser, banUser, logout,
     twofactorverification, disableTwoFactor, enableTwoFactor, facebooklogin, loginGoogle,
     promoteUser, updateuser, getUserImage, upload, passwordResetCtrl, forgetPasswordToken,
     updateUserPasswordCtrl, verifyUser, addUser, updateuseradmin 
 } = require("../../controller/UserController")
+
 
 
  // ========== routes
@@ -51,6 +53,7 @@ router.put("/promote/:id", promoteUser);
 router.put("/updateuser/:id", upload.single("image"), updateuser);
 router.put("/updateuseradmin/:id", upload.single("image"), updateuseradmin);
 router.get('/imageUser/:id/image',getUserImage);
+
 /////////////////////////////////////
 
 

@@ -731,7 +731,6 @@ const getUserImage = async (req, res) => {
     } else {
       user = await User.findOne({ facebookId: req.params.id });
     }
-
       if (!user) {
           return res.status(404).json({ message: 'User not found' });
       }
@@ -745,7 +744,7 @@ const getUserImage = async (req, res) => {
 
       res.sendFile(path.join(__dirname, '..', 'public', 'uploads', user.image));
 
-      console.log(path.join(__dirname, '..', 'public', 'uploads', user.image))
+      // console.log(path.join(__dirname, '..', 'public', 'uploads', user.image))
 
   } catch (error) {
       console.error(error);
