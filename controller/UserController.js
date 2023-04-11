@@ -534,7 +534,7 @@ const loginGoogle = async (req, res) => {
               twoFactorEnabled: twoFactorEnabled
             })
             .then(() => {
-                res.json("USER REGISTERED");
+                res.send(user);
             })
             .catch((err) => {
             if (err) {
@@ -849,6 +849,6 @@ const verifyUser = async (req, res, next) => {
   } catch (err) {
       res.status(400).json({error: err.message});
   }
-}
+}    
 
 module.exports = { register, login, profile, getAll, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin, loginGoogle, promoteUser,upload, getUserImage,updateuser,updateUser, deleteUser, banUser,addUser,banUser2,updateUserPasswordCtrl,forgetPasswordToken,passwordResetCtrl,verifyUser,updateuseradmin}
