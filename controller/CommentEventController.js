@@ -195,30 +195,34 @@ const handleEditReply = async (req, res) => {
 };
 
 
-const handleDeleteReply = async (commentId, replyId, username) => {
+const handleDeleteReply = async (req, res) => {
+  const { commentId, replyId } = req.params;
+  const { username } = req.body;
+
   try {
     let comment = await Comment.findById(commentId);
     if (!comment) {
-      throw new Error('Comment not found');
+      return res.status(404).send({ error: 'Comment not found' });
     }
 
     let reply = comment.replies.id(replyId);
     if (!reply) {
-      throw new Error('Reply not found');
+      return res.status(404).send({ error: 'Reply not found' });
     }
 
     if (reply.username !== username) {
-      throw new Error('You are not authorized to delete this reply');
+      return res.status(401).send({ error: 'You are not authorized to delete this reply' });
     }
 
     reply.remove();
-
     await comment.save();
-    console.log('Reply deleted successfully');
+
+    res.status(200).send({ message: 'Reply deleted successfully' });
   } catch (error) {
-    // Use server-side error handling mechanisms like `throw` or sending an error response
-    console.error(error.message);
+    console.error(error);
+    res.status(500).send({ error: 'Server error' });
   }
 };
+
 
 module.exports = { addCommentById, addReplyToCommentById, getCommentsByEventId,reportCommentById,updateCommentById,deleteCommentById ,handleEditReply,handleDeleteReply};
