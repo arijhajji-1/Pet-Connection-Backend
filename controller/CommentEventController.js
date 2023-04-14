@@ -166,30 +166,34 @@ const reportCommentById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-const handleEditReply = async (commentId, replyId, text, username) => {
+const handleEditReply = async (req, res) => {
+  const { commentId, replyId } = req.params;
+  const { text, username } = req.body;
   try {
-    let comment = await Comment.findById(commentId);
+    const comment = await Comment.findById(commentId);
     if (!comment) {
-      throw new Error('Comment not found');
+      return res.status(404).json({ message: 'Comment not found' });
     }
 
-    let reply = comment.replies.id(replyId);
+    const reply = comment.replies.id(replyId);
     if (!reply) {
-      throw new Error('Reply not found');
+      return res.status(404).json({ message: 'Reply not found' });
     }
 
     if (reply.username !== username) {
-      throw new Error('You are not authorized to edit this reply');
+      return res.status(403).json({ message: 'You are not authorized to edit this reply' });
     }
 
     reply.text = text;
-
     await comment.save();
-    console.log('Reply updated successfully');
+
+    return res.status(200).json({ message: 'Reply updated successfully' });
   } catch (error) {
     console.error(error.message);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 const handleDeleteReply = async (commentId, replyId, username) => {
   try {
@@ -212,7 +216,9 @@ const handleDeleteReply = async (commentId, replyId, username) => {
     await comment.save();
     console.log('Reply deleted successfully');
   } catch (error) {
+    // Use server-side error handling mechanisms like `throw` or sending an error response
     console.error(error.message);
   }
 };
+
 module.exports = { addCommentById, addReplyToCommentById, getCommentsByEventId,reportCommentById,updateCommentById,deleteCommentById ,handleEditReply,handleDeleteReply};
