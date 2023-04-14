@@ -226,6 +226,8 @@ const LikeEvent = async (req, res) => {
     // Check if the user has already liked the event
     if (!event.Like.includes(userId)) {
       event.Like.push(userId);
+      event.NumberLikes++; 
+
       await event.save();
       res.status(200).json({ event: { Like: event.Like } });
     } else {
@@ -254,6 +256,8 @@ const dislikeEvent = async (req, res) => {
     // Check if the user has already disliked the event
     if (event.Like.includes(userId)) {
       event.Like = event.Like.filter((likeUserId) => likeUserId.toString() !== userId);
+      event.NumberLikes--; // decrement the attendeeCount attribute
+
       await event.save();
       res.status(200).json({ event: { Like: event.Like } });
     } else {
