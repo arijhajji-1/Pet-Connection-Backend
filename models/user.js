@@ -44,6 +44,12 @@ var User = new schema({
     association: {
         type : String
     },
+    level: {
+        type : Number
+    },
+    xp: {
+        type : Number
+    },
 
     // ============================
 

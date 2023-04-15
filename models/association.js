@@ -23,6 +23,12 @@ var Association = new schema({
   longitude: {
     type: Number,
   },
+  date: {
+    type: Date
+  },
+  action: {
+    type : Number
+  }
 });
 
 module.exports = mongo.model("Association", Association);

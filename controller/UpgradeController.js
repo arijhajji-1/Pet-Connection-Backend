@@ -49,8 +49,8 @@ const upgradeUser = (req, res) => {
     __dirname,
     "..",
     "public",
-    "upgrades",
-    `logo${req.body.name}${logo.filename}`
+    "associations",
+    `${req.body.user}${logo.filename}`
     );
 
     // Rename the file to its original name with extension
@@ -70,7 +70,7 @@ const upgradeUser = (req, res) => {
           name: name,
           user: user,
           file: `${req.body.user}${file.filename}`,
-          logo: `logo${req.body.name}${logo.filename}`,
+          logo: `${req.body.user}${logo.filename}`,
           type: type,
           latitude: latitude,
           longitude: longitude,

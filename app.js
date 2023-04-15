@@ -23,6 +23,7 @@ mongo.connect("mongodb+srv://yosramekaoui:yosra@cluster0.aalwf4q.mongodb.net/ace
     console.log(err);
 });
 
+
 // ============= configuration express ================
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -51,9 +52,6 @@ app.use("/uploads", express.static("uploads"));
 app.use("/upgrades", express.static("upgrades"));
 
 
-// ======== association ===============
-var assocRouter = require("./routes/Association/association");
-app.use("/association", assocRouter); 
 
 
 

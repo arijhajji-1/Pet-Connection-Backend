@@ -172,6 +172,8 @@ const profile = async (req, res) => {
         res.send(err)
     }
 }
+ 
+
 const addUser = async (req, res) => {
   try {
       const { username, password, name, email, image, role, location, phone } = req.body;
@@ -744,7 +746,7 @@ const getUserImage = async (req, res) => {
 
       res.sendFile(path.join(__dirname, '..', 'public', 'uploads', user.image));
 
-      // console.log(path.join(__dirname, '..', 'public', 'uploads', user.image))
+      console.log(path.join(__dirname, '..', 'public', 'uploads', user.image))
 
   } catch (error) {
       console.error(error);
