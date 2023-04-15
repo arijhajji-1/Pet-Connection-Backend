@@ -23,15 +23,6 @@ mongo.connect("mongodb+srv://yosramekaoui:yosra@cluster0.aalwf4q.mongodb.net/ace
     console.log(err);
 });
 
-// mongo.connect(mongoconnection.url, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-// }).then(() => {
-//     console.log("DataBase Connected");
-// }).catch((err) => {
-//     console.log(err);
-// });
-
 
 // ============= configuration express ================
 var app = express();
@@ -48,7 +39,11 @@ app.use(session({
 
 // ============ routes =================
 var useRouter = require('./routes/User/user'); 
+var eventRouter = require('./routes/Events/Events');
 app.use('/user', useRouter); 
+app.use('/event',eventRouter);
+app.use('/uploads', express.static('uploads'));
+app.use('/public/uploads',express.static('public/uploads'));
 
 
 // ========== Upgrade =================
@@ -57,18 +52,6 @@ app.use("/uploads", express.static("uploads"));
 app.use("/upgrades", express.static("upgrades"));
 
 
-// ======== association ===============
-var assocRouter = require("./routes/Association/association");
-app.use("/association", assocRouter); 
-
-
-// ======= funding ===================
-var fundingRouter = require("./routes/Funding/funding"); 
-app.use("/funding", fundingRouter); 
-
-// ======= donation ===================
-var donationRouter = require("./routes/Donation/donation"); 
-app.use("/donation", donationRouter); 
 
 
 

@@ -1,4 +1,5 @@
 const mongo = require('mongoose');
+const mongoose = require('mongoose');
 const schema = mongo.Schema; 
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
@@ -75,8 +76,8 @@ var User = new schema({
             type: Boolean,
             default: false
         },
-     facebookId: String,
-     google: {
+        facebookId: String,
+        google: {
         type : Boolean
     },
     passwordChangeAt: Date,

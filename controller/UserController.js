@@ -172,7 +172,7 @@ const profile = async (req, res) => {
         res.send(err)
     }
 }
-
+ 
 
 const addUser = async (req, res) => {
   try {
@@ -733,7 +733,6 @@ const getUserImage = async (req, res) => {
     } else {
       user = await User.findOne({ facebookId: req.params.id });
     }
-
       if (!user) {
           return res.status(404).json({ message: 'User not found' });
       }
