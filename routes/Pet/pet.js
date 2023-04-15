@@ -44,6 +44,7 @@ router.get('/comments', commentcontroller.getAllComments);
 router.get("/getallpets",controller.getAllPetsAdmin);
 router.put("/updatepet",controller.updatePetAdmin);
 router.delete("/deletepetadmin/:id",controller.deletepetAdmin);
+router.put("/deletimagepet/:petId",controller.deletepetimgae);
 //test django api 
 router.post('/predict', upload.single('image'), (req, res) => {   
   const form = new FormData();

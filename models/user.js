@@ -68,7 +68,6 @@ var User = new schema({
           ref: 'Pet'
         }
       ]  ,
-
       losts: [
         {
           type: schema.Types.ObjectId,

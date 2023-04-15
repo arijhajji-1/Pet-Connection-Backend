@@ -192,8 +192,38 @@ async function deletepetAdmin(req, res) {
     res.status(500).json({ error: 'Server error' });
   }
 }
+//delete pet from user
+async function deletepetimgae(req, res) {
+  try {
+    //get user 
+    console.log(req.body.user1)
+
+    // // Find the pet to be removed
+    const petId = req.params.petId;
+    const pett = await pet.findById(petId);
+    console.log(pett)
+    if (!pett) {
+      return res.status(404).json({ error: 'Pet not found' });
+    }
+
+
+    // Remove the image from the pet's images array
+    // const imageIndex = pett.images.indexOf(req.params.id);
+  
+      pett.images.shift();
+      await pett.save();
+    
+
+    res.json({ message: 'Image deleted successfully' });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+}
+
 
 
 module.exports = {
-  addPet, getAllpets, addPetwithUser, deletepet, updatePetwithUser, getAllPetsAdmin, updatePetAdmin,deletepetAdmin
+  addPet, getAllpets, addPetwithUser, deletepet, updatePetwithUser, getAllPetsAdmin, updatePetAdmin,deletepetAdmin,deletepetimgae
 }
