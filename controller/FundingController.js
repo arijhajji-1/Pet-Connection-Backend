@@ -185,10 +185,10 @@ const avatar = async (req, res) => {
   const url = "https://stablediffusionapi.com/api/v3/img2img";
   const data = {
     key: "l1UqBXYfTI0Mf0xJtt05VlWXvUls2PiEoGIqdgOehDGetWtJYEIeFHHcsFZ3",
-    prompt: "make avatar of my pet",
+    prompt: req.body.prompt,
     negative_prompt: null,
     init_image:
-      "https://images.unsplash.com/photo-1611003228941-98852ba62227?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YmFieSUyMGRvZ3xlbnwwfHwwfHw%3D&w=1000&q=80",
+      "https://res.cloudinary.com/dszmvlrpt/image/upload/v1681122615/zx7axhxmfpsejucywj7u.jpg",
     width: "512",
     height: "512",
     samples: "1",
@@ -209,7 +209,7 @@ const avatar = async (req, res) => {
     },
   };
 
-  fetch(url, options)
+  await fetch(url, options)
     .then((response) => response.json())
     .then((data) => res.send(data))
     .catch((error) => console.error(error));
