@@ -56,6 +56,9 @@ var User = new schema({
     bio: {
         type : String  
     },
+    location: {
+        type: String 
+    },
     createdAt: {
         type: Date
     },
@@ -78,12 +81,19 @@ var User = new schema({
         },
         facebookId: String,
         google: {
+
         type : Boolean
     },
     passwordChangeAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
     isUserVerified: {type: Boolean, default: false},
+
+    cart:
+    {
+        type: schema.Types.ObjectId,
+        ref: 'Cart'
+    }
 });
 
 
@@ -103,6 +113,7 @@ User.methods.createPasswordResetToken = async function () {
 
   
     }
+
 
 };
 

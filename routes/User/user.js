@@ -11,6 +11,7 @@ const passport = require("passport");
 
 const { createToken, validateToken } = require('../../midill/JWT/JWT'); 
 
+
 const { register, login, profile, getAll, updateUser, deleteUser, banUser, logout,
     twofactorverification, disableTwoFactor, enableTwoFactor, facebooklogin, loginGoogle,
     promoteUser, updateuser, getUserImage, upload, passwordResetCtrl, forgetPasswordToken,
@@ -73,6 +74,7 @@ router.put("/update/:id", updateUser)
 
 
 
+
 // ====== SPRINT 2 : Module Association 
 const multer = require("multer");
 const path = require("path");
@@ -95,6 +97,7 @@ router.get("/AllUpgrades", getAllUpgrades);
 router.delete("/deleteUpgrade/:id", deleteUpgrade); 
 router.put("/changeType/:id",  changeType); 
 router.get("/getAllAssociations", getAllAssociations); 
+
 
 
 

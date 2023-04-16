@@ -8,6 +8,8 @@ const { sign, verify } = require('jsonwebtoken')
 require('dotenv').config();
 const mongoose = require('mongoose'); 
 
+const crypto = require('crypto')
+
 const fetch = require('node-fetch');
 const user = require('../models/user');
 const passport = require("passport");
@@ -172,7 +174,6 @@ const profile = async (req, res) => {
         res.send(err)
     }
 }
- 
 
 const addUser = async (req, res) => {
   try {
@@ -536,7 +537,9 @@ const loginGoogle = async (req, res) => {
               twoFactorEnabled: twoFactorEnabled
             })
             .then(() => {
+
                 res.send(user);
+
             })
             .catch((err) => {
             if (err) {
@@ -733,6 +736,7 @@ const getUserImage = async (req, res) => {
     } else {
       user = await User.findOne({ facebookId: req.params.id });
     }
+
       if (!user) {
           return res.status(404).json({ message: 'User not found' });
       }
@@ -768,7 +772,8 @@ console.log(email)
       await user.save();
 
       //build your message
-      const resetURL = `If you were requested to reset your password, reset now within 10 minutes, otherwise ignore this message <a href="http://localhost:3001/resetpassword/${token}">Click to Reset</a>`;
+      const resetURL = `If you were requested to reset your password, reset now within 10 minutes, otherwise ignore this message "http://localhost:3001/resetpassword/${token}" Click to Reset`;
+
       const msg = {
           to: email,
           from: "yosramekaoui@gmail.com",
@@ -847,10 +852,13 @@ const verifyUser = async (req, res, next) => {
       user.isUserVerified = true;
 
       await user.save();
-      res.status(200).json( 'Account verified');
+
+      //res.status(200).json( 'Account verified');
+      res.render("email.twig");
   } catch (err) {
       res.status(400).json({error: err.message});
   }
-}    
+}
+
 
 module.exports = { register, login, profile, getAll, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin, loginGoogle, promoteUser,upload, getUserImage,updateuser,updateUser, deleteUser, banUser,addUser,banUser2,updateUserPasswordCtrl,forgetPasswordToken,passwordResetCtrl,verifyUser,updateuseradmin}
