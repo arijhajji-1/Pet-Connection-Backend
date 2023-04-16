@@ -72,7 +72,7 @@ exports.addProductToCart = async (req, res) => {
 exports.getCartProductsByUser = async (req, res) => {
   try {
     // const user1 = await User.findById(req.body.user._id);
-    const cart = await Cart.findOne({ userId: "64258e582f6e354091dcfe6d"});
+    const cart = await Cart.findOne({ userId: req.body.user._id});
     if (!cart) {
       console.log("cart vide")
       return []; // return an empty array if no cart is found for the given user ID
@@ -183,7 +183,7 @@ exports.updateCart = async (req,res) => {
 }
 exports.deleteCart = async (req, res) => {
     try {
-      await Cart.findByIdAndDelete(req.params.id);
+      await Cart.findOneAndDelete({ userId: req.params.id });
       res.status(200).json("Product Deleted")
     } catch (error) {
         res.status(500).json(err);
