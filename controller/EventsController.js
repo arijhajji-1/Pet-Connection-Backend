@@ -79,13 +79,8 @@ const createEvent = async (req, res) => {
       newEvent.image = filename;
     }
 
-    if (req.file && req.file.fieldname === 'organizerPic') {
-      const organizerPicFilename = `${Date.now()}-${req.file.originalname}`;
-      const organizerPicFilepath = `uploads/${organizerPicFilename}`;
-      fs.renameSync(req.file.path, organizerPicFilepath);
-      newEvent.organizerPic = organizerPicFilename;
-    }
-
+    
+console.log(req.body.organizerPic)
     await newEvent.save();
     res.json(newEvent);
   } catch (error) {
