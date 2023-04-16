@@ -41,7 +41,8 @@ var useRouter = require('./routes/User/user');
 var eventRouter = require('./routes/Events/Events');
 app.use('/user', useRouter); 
 app.use('/event',eventRouter);
-app.use('/uploads', express.static('uploads'));
+app.use(express.static("public"));
+app.use(express.static('uploads'));
 app.use('/public/uploads',express.static('public/uploads'));
 
 
