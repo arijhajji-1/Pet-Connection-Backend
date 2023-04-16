@@ -206,10 +206,6 @@ async function deletepetimgae(req, res) {
       return res.status(404).json({ error: 'Pet not found' });
     }
 
-
-    // Remove the image from the pet's images array
-    // const imageIndex = pett.images.indexOf(req.params.id);
-  
       pett.images.shift();
       await pett.save();
     

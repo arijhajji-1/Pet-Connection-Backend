@@ -128,15 +128,17 @@ async function deleteLostById(req, res) {
 // update 
 async function updatelost(req, res)  {
   try {
-    // Find the lost pet by ID
-    const lostPet = await lost.findById(req.params.id);
-
-    // Update the lost pet with new data from request body
+    const lostPet = await lost.findById(req.params.id)
     lostPet.description = req.body.description;
     lostPet.location = req.body.location;
     lostPet.color = req.body.color;
     lostPet.breed = req.body.breed;
     lostPet.type = req.body.type;
+    // lostPet.image=req.files.map((file) => file.filename);
+    if (req.file) {
+      // Update the image property with the filename
+      lostPet.image = req.file.filename;
+    }
     
     // Save the updated lost pet to the database
     const updatedLostPet = await lostPet.save();

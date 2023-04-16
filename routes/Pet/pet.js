@@ -54,6 +54,7 @@ router.post('/predict', upload.single('image'), (req, res) => {
       ...form.getHeaders(),
     },
   })
+  
     .then((response) => {
       console.log(response.data);
       res.json(response.data);
