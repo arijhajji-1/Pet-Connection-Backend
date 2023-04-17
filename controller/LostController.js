@@ -43,9 +43,7 @@ async function addlostwithUser(req, res) {
    await user1.save();
 
   res.status(201).json({ message: 'Pet added successfully' });
-
 }
-
 // GET all pets for the authenticated user
 async function getAllLostsuser(req, res) {
   try { 

@@ -104,10 +104,8 @@ var User = new schema({
       ]  ,
       notification:{
         type:Array
-      }
-      
-
-
+      } ,
+    
     cart:
     {
         type: schema.Types.ObjectId,
