@@ -79,6 +79,33 @@ app.use(express.static('public'));
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+//============= router Publication =================
+
+var PublicationRouter = require('./routes/Publications/Publication'); 
+app.use('/publication', PublicationRouter); 
+
+
+//============= router Publication =================
+var CommnetRouter = require('./routes/Publications/comment'); 
+app.use('/comment', CommnetRouter); 
+
+
+
+
+
 // =============== google auth ======= 
 // app.use(
 //   cookieSession({
