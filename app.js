@@ -5,13 +5,8 @@ const mongoconnection = require('./config/mongoconnection.json');
 const bodyParser = require("body-parser");
 const cors = require('cors');
 const session = require('express-session')
-
-// ====== google auth =============
-// require("dotenv").config(); 
-// const passport = require("passport"); 
-// const cookieSession = require("cookie-session"); 
-// const passportSetup = require("./routes/User/passport"); 
-// const authRoute = require("./routes/User/auth");
+const path = require("path");
+const paymentRoutes=require("./routes/Marketplace/payment");
 
 
 // =========== Database Connection ==============
@@ -20,18 +15,12 @@ mongo.connect("mongodb+srv://yosramekaoui:yosra@cluster0.aalwf4q.mongodb.net/ace
     console.log(err);
 });
 
-// mongo.connect(mongoconnection.url, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-// }).then(() => {
-//     console.log("DataBase Connected");
-// }).catch((err) => {
-//     console.log(err);
-// });
 
 
 // ============= configuration express ================
 var app = express();
+app.set("views" , path.join(__dirname, "views"));
+app.set("view engine", "twig");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
@@ -45,7 +34,47 @@ app.use(session({
 
 // ============ routes =================
 var useRouter = require('./routes/User/user'); 
+var eventRouter = require('./routes/Events/Events');
+var associationRouter = require("./routes/Association/Association");
+
 app.use('/user', useRouter); 
+app.use('/event',eventRouter);
+app.use(express.static("public"));
+app.use(express.static('uploads'));
+app.use('/public/uploads',express.static('public/uploads'));
+
+
+// ========== Upgrade =================
+app.use(express.static("public"));
+app.use("/uploads", express.static("uploads"));
+app.use("/upgrades", express.static("upgrades"));
+
+
+// ======== association ===============
+var assocRouter = require("./routes/Association/Association");
+app.use("/association", assocRouter); 
+
+
+// ======= funding ===================
+var fundingRouter = require("./routes/Funding/funding"); 
+app.use("/funding", fundingRouter); 
+
+// ======= donation ===================
+var donationRouter = require("./routes/Donation/donation"); 
+app.use("/donation", donationRouter); 
+
+
+var productRouter = require('./routes/Marketplace/product'); 
+app.use('/product', productRouter);
+var cartRouter = require('./routes/Marketplace/cart'); 
+app.use('/', cartRouter);
+var orderRouter = require('./routes/Marketplace/order'); 
+app.use('/', orderRouter);
+var couponRouter = require('./routes/Marketplace/coupon'); 
+app.use('/coupon', couponRouter);
+app.use('/payment',paymentRoutes);
+app.use(express.static('public'));
+
 
 
 

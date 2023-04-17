@@ -17,6 +17,7 @@ const { register, login, profile, getAll, updateUser, deleteUser, banUser,
        forgetPasswordToken,updateUserPasswordCtrl,verifyUser,addUser,updateuseradmin,getuserInfo } = require("../../controller/UserController")
 
 
+
  // ========== routes
  
 
@@ -76,6 +77,34 @@ router.get("/userInfo/:iduser/userInfo", getuserInfo)
 
 
 
-//////////////////////////////
+
+
+// ====== SPRINT 2 : Module Association 
+const multer = require("multer");
+const path = require("path");
+
+const {
+  upgradeUser,
+  getAllUpgrades,
+  deleteUpgrade,
+  changeType,
+  getAllAssociations
+} = require("../../controller/UpgradeController");
+
+router.post("/upgrade", upload.fields([
+    { name: "file", maxCount: 1 },
+    { name: "logo", maxCount: 1 },
+]), upgradeUser);
+
+  
+router.get("/AllUpgrades", getAllUpgrades); 
+router.delete("/deleteUpgrade/:id", deleteUpgrade); 
+router.put("/changeType/:id",  changeType); 
+router.get("/getAllAssociations", getAllAssociations); 
+
+
+
+
+
 
 module.exports = router; 
