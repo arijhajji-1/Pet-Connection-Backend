@@ -76,6 +76,22 @@ const getCommentsByEventId = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+const deleteComment = async (req, res) => {
+  const commentId = req.params.commentId;
+
+  try {
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    await Comment.findByIdAndDelete(comment._id);
+    res.json({ message: 'Comment deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 // DELETE a comment by ID
 const deleteCommentById = async (req, res) => {
   const commentId = req.params.commentId;
@@ -152,15 +168,18 @@ const reportCommentById = async (req, res) => {
     }
 
     comment.reportedBy.push(userId);
-
-    if (comment.reportedBy.length >= 3) {
-      await Comment.findByIdAndDelete(comment._id);
-      return res.json({ message: 'Comment deleted successfully' });
-    }
-
-
     await comment.save();
+    
     res.json(comment);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+const getReportedComments = async (req, res) => {
+  try {
+    const reportedComments = await Comment.find({reportedBy: {$exists: true, $not: {$size: 0}}}).populate('author');
+    res.json(reportedComments);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -225,4 +244,4 @@ const handleDeleteReply = async (req, res) => {
 };
 
 
-module.exports = { addCommentById, addReplyToCommentById, getCommentsByEventId,reportCommentById,updateCommentById,deleteCommentById ,handleEditReply,handleDeleteReply};
+module.exports = { addCommentById, addReplyToCommentById, getCommentsByEventId,reportCommentById,updateCommentById,deleteCommentById ,handleEditReply,handleDeleteReply,getReportedComments,deleteComment};
