@@ -56,6 +56,7 @@ var User = new schema({
     bio: {
         type : String  
     },
+
     location: {
         type: String 
     },
@@ -79,9 +80,9 @@ var User = new schema({
             type: Boolean,
             default: false
         },
+
         facebookId: String,
         google: {
-
         type : Boolean
     },
     passwordChangeAt: Date,
@@ -89,11 +90,30 @@ var User = new schema({
     passwordResetExpires: Date,
     isUserVerified: {type: Boolean, default: false},
 
+    pets: [
+        {
+          type: schema.Types.ObjectId,
+          ref: 'Pet'
+        }
+      ]  ,
+      losts: [
+        {
+          type: schema.Types.ObjectId,
+          ref: 'lost'
+        }
+      ]  ,
+      notification:{
+        type:Array
+      }
+      
+
+
     cart:
     {
         type: schema.Types.ObjectId,
         ref: 'Cart'
     }
+
 });
 
 

@@ -26,11 +26,17 @@
     "express-async-handler": "^1.2.0",
     "express-session": "^1.17.3",
     "face-api.js": "^0.22.2",
+    "form-data": "^4.0.0",
     "http": "^0.0.1-security",
+    "joi": "^17.9.1",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.9.2",
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^2.6.9",
+    "node-localstorage": "^2.2.1",
+    "node-webcam": "^0.8.1",
+    "nodemailer": "^6.9.1",
+    "openai": "^3.2.1",
     "node-webcam": "^0.8.1",
     "nodemailer": "^6.9.1",
     "passport": "^0.6.0",
@@ -48,5 +54,6 @@
   "devDependencies": {
     "nodemon": "^2.0.22"
 
+>>>>>>> main
   }
 }
