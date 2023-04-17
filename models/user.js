@@ -1,4 +1,5 @@
 const mongo = require('mongoose');
+const mongoose = require('mongoose');
 const schema = mongo.Schema; 
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
@@ -31,6 +32,31 @@ var User = new schema({
     image: {
         type: String
     },
+
+    // ===== association =======
+    
+    latitude: {
+        type : Number
+    },
+    longitude: {
+        type : Number
+    },
+    association: {
+        type : String
+    },
+    level: {
+        type : Number
+    },
+    xp: {
+        type : Number
+    },
+
+    // ============================
+
+    bio: {
+        type : String  
+    },
+
     location: {
         type: String 
     },
@@ -54,14 +80,16 @@ var User = new schema({
             type: Boolean,
             default: false
         },
-     facebookId: String,
-     google: {
+
+        facebookId: String,
+        google: {
         type : Boolean
     },
     passwordChangeAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
     isUserVerified: {type: Boolean, default: false},
+
     pets: [
         {
           type: schema.Types.ObjectId,
@@ -78,6 +106,14 @@ var User = new schema({
         type:Array
       }
       
+
+
+    cart:
+    {
+        type: schema.Types.ObjectId,
+        ref: 'Cart'
+    }
+
 });
 
 
@@ -97,6 +133,7 @@ User.methods.createPasswordResetToken = async function () {
 
   
     }
+
 
 };
 

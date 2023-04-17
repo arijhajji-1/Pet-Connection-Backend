@@ -8,6 +8,10 @@ const { sign, verify } = require('jsonwebtoken')
 require('dotenv').config();
 const mongoose = require('mongoose'); 
 
+
+const crypto = require('crypto')
+
+
 const fetch = require('node-fetch');
 const user = require('../models/user');
 const passport = require("passport");
@@ -139,7 +143,9 @@ const login = async (req, res) => {
             } else {
                 const accessToken = createToken(user);
                 res.cookie("access-token", accessToken, {
+
                     maxAge: 60 * 60 * 24 * 30 * 1000,httpOnly:true
+
                 }) // cookie expires after 30 days
 
                 req.session.user = user; 
@@ -253,6 +259,7 @@ const updateUser = async (req, res) => {
 
       // Update user
       const hash = await bcrypt.hash(password, 10);
+
       user.username = username;
       user.password = hash;
       user.name = name;
@@ -535,7 +542,7 @@ const loginGoogle = async (req, res) => {
               twoFactorEnabled: twoFactorEnabled
             })
             .then(() => {
-                res.json("USER REGISTERED");
+                res.send(user);
             })
             .catch((err) => {
             if (err) {
@@ -612,6 +619,7 @@ const upload = multer({
   // fileFilter: fileFilter
 
 });
+
 const updateuser = async (req, res) => {
 
 
@@ -620,6 +628,7 @@ const updateuser = async (req, res) => {
   //    const connectedUserId = "64065e26c601ae53912b5476"; //test user sur la base mongo cloud 
 
   //  const connectedUserId= await User.findById()
+
 
 
   try {
@@ -753,6 +762,7 @@ const getUserImage = async (req, res) => {
       res.status(500).json({ message: 'Server error' });
   }
 };
+
 const forgetPasswordToken = async (req, res) => {
   //find the user by email
   const {email} = req.body;
@@ -768,7 +778,9 @@ console.log(email)
       await user.save();
 
       //build your message
-      const resetURL = `If you were requested to reset your password, reset now within 10 minutes, otherwise ignore this message <a href="http://localhost:3001/resetpassword/${token}">Click to Reset</a>`;
+
+      const resetURL = `If you were requested to reset your password, reset now within 10 minutes, otherwise ignore this message "http://localhost:3001/resetpassword/${token}" Click to Reset`;
+
       const msg = {
           to: email,
           from: "yosramekaoui@gmail.com",
@@ -847,10 +859,43 @@ const verifyUser = async (req, res, next) => {
       user.isUserVerified = true;
 
       await user.save();
-      res.status(200).json( 'Account verified');
+
+
+      //res.status(200).json( 'Account verified');
+      res.render("email.twig");
   } catch (err) {
       res.status(400).json({error: err.message});
   }
+
+
 }
 
-module.exports = { register, login, profile, getAll, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin, loginGoogle, promoteUser,upload, getUserImage,updateuser,updateUser, deleteUser, banUser,addUser,banUser2,updateUserPasswordCtrl,forgetPasswordToken,passwordResetCtrl,verifyUser,updateuseradmin}
+
+
+
+const getuserInfo = async (req, res, next) => {
+
+  try {
+      
+    //verifier le token 
+    // const accessToken = req.cookies["access-token"]; //token
+    // if (!accessToken) {
+    //   return res.status(401).json({ message: "Access token not found" });
+    // }
+
+    //get publication
+    const data = await User.findById(req.params.iduser);
+    res.send(data)
+  } catch (err) {
+    res.send(err)
+  }
+
+
+
+}
+
+
+
+module.exports = { register, login, profile, getAll, deleteUser, banUser, logout ,twofactorverification,enableTwoFactor,disableTwoFactor,facebooklogin, loginGoogle, promoteUser,upload, getUserImage,updateuser,updateUser, deleteUser, banUser,addUser,banUser2,updateUserPasswordCtrl,forgetPasswordToken,passwordResetCtrl,verifyUser,updateuseradmin,getuserInfo}
+
+
