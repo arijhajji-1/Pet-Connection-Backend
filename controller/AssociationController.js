@@ -208,6 +208,16 @@ const upgradeToAssociation = async (req, res) => {
     });
    
 };
+ 
+const deleteAllAssociations = async (req, res) => {
+  try {
+    await Association.deleteMany({});
+    res.send("All associations deleted!");
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 
 
 module.exports = {
@@ -217,5 +227,6 @@ module.exports = {
   getOneAssociation,
   getAssociationByUser,
   editAssociation,
-  upgradeToAssociation
+  upgradeToAssociation,
+  deleteAllAssociations,
 }; 
