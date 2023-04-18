@@ -178,7 +178,7 @@ const reportCommentById = async (req, res) => {
 };
 const getReportedComments = async (req, res) => {
   try {
-    const reportedComments = await Comment.find({reportedBy: {$exists: true, $not: {$size: 0}}}).populate('author');
+    const reportedComments = await Comment.find({reportedBy: {$exists: true, $not: {$size: 0}}}).populate('username');
     res.json(reportedComments);
   } catch (error) {
     console.error(error);
