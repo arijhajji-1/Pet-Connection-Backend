@@ -1,5 +1,7 @@
 const Event = require('../models/Events');
 const { sign, verify } = require('jsonwebtoken')
+const axios = require('axios');
+const FormData = require('form-data');
 
 const fs = require('fs');
 const User = require('../models/user');
@@ -45,6 +47,33 @@ const getEventById = async (req, res) => {
 const getConnectedUserId = (req) => {
   return req.query.userId || req.params.userId;
 };
+
+
+
+
+const predictedEmotion = async (req, res) => {
+  try {
+    const form = new FormData();
+    const image = req.file;
+    form.append('image', fs.createReadStream(image.path), image.filename);
+
+    const djangoUrl = 'http://localhost:8000/emotion/emotion/result/';
+    const response = await axios.post(djangoUrl, form, {
+      headers: {
+        ...form.getHeaders()
+      },
+    });
+
+    const predictedEmotion = response.data;
+    return res.status(200).json({ predictedEmotion });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Error predicting emotion' });
+  }
+};
+
+
+
 
 
 
@@ -275,4 +304,4 @@ const dislikeEvent = async (req, res) => {
 
 
 
-module.exports = { getAllEvents, getEventById, createEvent, updateEventById, deleteEventById, upload, addAttendeeById, removeAttendeeById, LikeEvent, dislikeEvent };
+module.exports = { getAllEvents, getEventById, createEvent, updateEventById, deleteEventById, upload, addAttendeeById, removeAttendeeById, LikeEvent, dislikeEvent,predictedEmotion };
