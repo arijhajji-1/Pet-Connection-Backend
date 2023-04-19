@@ -7,6 +7,8 @@ const Reply = require('../models/Reply');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 
+const nodemailer = require("nodemailer");
+
 
 
 
@@ -289,6 +291,65 @@ async function deleteComment(req, res, next) {
       }
   
       res.status(200).json({ message: 'Comment deleted' });
+
+
+
+// /////////////////////////////////////////////////////////////
+
+ // envoyer un email********************a activé
+
+    // Trouver les informations de contact du propriétaire
+    const proprietaire = await User.findById(comment.user);
+    const emailDuProprietaire = proprietaire.email;
+
+
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+            user: "testini435@gmail.com",
+            pass: "zinehprkliupnwuk",
+        },
+    });
+
+      // Envoyer l'e-mail au propriétaire
+      await transporter.sendMail({
+        from: "ghannay.oussama@esprit.tn",
+        to: emailDuProprietaire,
+        subject: "Votre commentaire a été supprimé",
+        text: `Bonjour ${proprietaire.name}, votre commentaire a été supprimé .`
+      }).then(()=> console.log("email commentaire envoyee"));
+
+
+
+
+
+
+
+
+
+
+
+
+// ////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     } catch (err) {
       res.status(400).json({ message: err.message });
     }
@@ -339,6 +400,63 @@ async function deleteReply(req, res, next) {
 
         if (!comment) throw new Error('comment not found');
         res.status(200).json({ message: 'Reply deleted' });
+
+
+
+
+
+        
+
+// /////////////////////////////////////////////////////////////
+
+ // envoyer un email********************a activé
+
+    // Trouver les informations de contact du propriétaire
+    const proprietaire = await User.findById(reply.user);
+    const emailDuProprietaire = proprietaire.email;
+
+
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+            user: "testini435@gmail.com",
+            pass: "zinehprkliupnwuk",
+        },
+    });
+
+      // Envoyer l'e-mail au propriétaire
+      await transporter.sendMail({
+        from: "ghannay.oussama@esprit.tn",
+        to: emailDuProprietaire,
+        subject: "Votre reply a été supprimé",
+        text: `Bonjour ${proprietaire.name}, votre reply a été supprimé .`
+      }).then(()=> console.log("email reply envoyee"));
+
+
+
+
+
+
+
+
+
+
+
+
+// ////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
@@ -414,4 +532,3 @@ module.exports = {
         replytoComment,getreplyByID,getCommnetById,deleteReply
 
     }
-
