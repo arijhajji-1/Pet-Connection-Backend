@@ -3,11 +3,24 @@ const router = express.Router();
 const { createToken, validateToken } = require('../../midill/JWT/JWT'); 
 const cookieParser = require("cookie-parser")
 const bodyparser = require("body-parser")  
+const multer = require("multer");
+const FormData = require('form-data');
+const fs = require('fs');
+const axios = require('axios');
 router.use(express.json())
 router.use(cookieParser())
-const {getAllEvents, getEventById, createEvent, updateEventById, upload,deleteEventById ,  addAttendeeById, removeAttendeeById, LikeEvent, dislikeEvent }= require("../../controller/EventsController")
+const {getAllEvents, getEventById, createEvent, updateEventById, upload,deleteEventById ,  addAttendeeById, removeAttendeeById, LikeEvent, dislikeEvent, predictedEmotion }= require("../../controller/EventsController")
 const { addCommentById, addReplyToCommentById,getCommentsByEventId, deleteCommentById, updateCommentById, reportCommentById,handleDeleteReply,handleEditReply, getReportedComments, deleteComment}= require("../../controller/CommentEventController")
-
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, "public/uploads"); 
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + "-" + file.originalname);
+    },
+  });
+  
+  const uploads = multer({ storage: storage });
 // GET all events
 router.get('/getAll', getAllEvents);
 
@@ -45,5 +58,6 @@ router.post ('/likeEvent/:eventId',LikeEvent);
 router.delete('/dislikeEvent/:eventId',dislikeEvent);
 router.get('/reportedComment',getReportedComments);
 router.delete ('/deleteComments/:commentId',deleteComment);
+router.post('/predict_emotion', uploads.single('image'), predictedEmotion);
 
 module.exports = router;
