@@ -176,17 +176,42 @@ const config=new Configuration({
 const openai=new OpenAIApi(config);
 
 
-app.post("/chat",async(req,res)=>{
-  const {prompt}=req.body;
-  console.log(prompt)
-  const completion =await openai.createCompletion({
-    model:"text-davinci-003",
-    max_tokens:512,
-    temperature:0,
-    prompt:prompt,
+// app.post("/chat",async(req,res)=>{
+//   const {prompt}=req.body;
+//   console.log(prompt)
+//   const completion =await openai.createCompletion({
+//     model:"text-davinci-003",
+//     max_tokens:512,
+//     temperature:0,
+//     prompt:prompt,
+//   });
+//   res.send(completion.data.choices[0].text); 
+// })
+const animalKeywords = ["cat", "dog", "pet", "animal", "puppy", "kitten", "hamster", "rabbit", "fish"];
+
+app.post("/chat", async (req, res) => {
+  const { prompt } = req.body;
+
+  // check if prompt contains any animal keywords
+  const containsKeyword = animalKeywords.some((keyword) =>
+    prompt.toLowerCase().includes(keyword)
+  );
+
+  if (!containsKeyword) {
+    res.send("Sorry, I can only answer questions about pets and animals.");
+    return;
+  }
+
+  console.log(prompt);
+  const completion = await openai.createCompletion({
+    model: "text-davinci-003",
+    max_tokens: 512,
+    temperature: 0,
+    prompt: prompt,
   });
-  res.send(completion.data.choices[0].text); 
-})
+  res.send(completion.data.choices[0].text);
+});
+
 
 app.post("/chatDM", async (req, res) => {
   const { username, secret } = req.body;
@@ -199,8 +224,8 @@ app.post("/chatDM", async (req, res) => {
       headers: {
         
         "Project-ID": CHAT_ENGINE_PROJECT_ID,
-        "User-Name": "chatchat3",
-        "User-Secret": "chatchat3",
+        "User-Name": username,
+        "User-Secret": secret,
       },
     });
     return res.status(r.status).json(r.data);
