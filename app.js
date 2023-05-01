@@ -7,6 +7,7 @@ const cors = require('cors');
 
 const session = require('express-session');
 const {Configuration,OpenAIApi}=require("openai")
+const axios = require('axios');
 
 // ====== google auth =============
 // require("dotenv").config(); 
@@ -17,7 +18,8 @@ const {Configuration,OpenAIApi}=require("openai")
 
 const path = require("path");
 const paymentRoutes=require("./routes/Marketplace/payment");
-
+const CHAT_ENGINE_PROJECT_ID = "bccb6fcd-364e-424e-934a-1c8cd591efaa";
+const CHAT_ENGINE_PRIVATE_KEY = "e057975e-54d5-44a8-9a78-1fa71c1967a4";
 
 
 // =========== Database Connection ==============
@@ -43,7 +45,9 @@ app.set("views" , path.join(__dirname, "views"));
 app.set("view engine", "twig");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+  origin: '*'
+}));
 app.use(session({
   secret: 'azjdn1dkd3ad', // Set a secret key for session encryption
   resave: false,
@@ -183,5 +187,49 @@ app.post("/chat",async(req,res)=>{
   });
   res.send(completion.data.choices[0].text); 
 })
+
+app.post("/chatDM", async (req, res) => {
+  const { username, secret } = req.body;
+
+  // Fetch this user from Chat Engine in this project!
+  // Docs at rest.chatengine.io
+  try {
+    console.log(username+secret+"dddddddddddddd")
+    const r = await axios.get("https://api.chatengine.io/users/me/", {
+      headers: {
+        
+        "Project-ID": CHAT_ENGINE_PROJECT_ID,
+        "User-Name": "chatchat3",
+        "User-Secret": "chatchat3",
+      },
+    });
+    return res.status(r.status).json(r.data);
+  } catch (e) {
+    return res.status(e.response.status).json(e.response.data);
+  }
+});
+// app.post("/chatDM", async (req, res) => {
+//   const { username, secret } = req.body;
+
+//   try {
+//     const r = await axios.get("https://api.chatengine.io/users/me/", {
+//       headers: {
+//         "Project-ID": CHAT_ENGINE_PROJECT_ID,
+//         "User-Name": username,
+//         "User-Secret": secret,
+//       },
+//     });
+//     return res.status(r.status).json(r.data);
+//   } catch (e) {
+//     if (e.response) {
+//       return res.status(e.response.status).json(e.response.data);
+//     } else {
+//       // Handle other errors
+//       console.log(e);
+//       return res.status(500).json({ error: "Internal Server Error" });
+//     }
+//   }
+// });
+
 app.use('/pet', petRouter); 
 

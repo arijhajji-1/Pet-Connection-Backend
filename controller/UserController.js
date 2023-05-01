@@ -7,6 +7,8 @@ const bcrypt = require("bcrypt");
 const { sign, verify } = require('jsonwebtoken')
 require('dotenv').config();
 const mongoose = require('mongoose'); 
+const CHAT_ENGINE_PROJECT_ID = "bccb6fcd-364e-424e-934a-1c8cd591efaa";
+const CHAT_ENGINE_PRIVATE_KEY = "e057975e-54d5-44a8-9a78-1fa71c1967a4";
 
 
 const crypto = require('crypto')
@@ -78,7 +80,17 @@ const SECRET_KEY = '6LddytQkAAAAAHHRyYuAnU5wmOBTwAkLZzS3mfEC'
 const register = (req, res) => {
 
     try{
+     
         const { username, password, name, email,token, image, role, location, phone } = req.body;
+        secret =username;
+        first_name=name;
+        last_name=username
+        const r =  axios.post(
+          "https://api.chatengine.io/users/",
+          { username, secret, email, first_name, last_name },
+       
+          { headers: { "Private-Key": CHAT_ENGINE_PRIVATE_KEY } });
+        console.log(r);
         axios({
             url:`https://www.google.com/recaptcha/api/siteverify?secret=${SECRET_KEY}&response=${token}`,
             method: 'POST'
@@ -129,7 +141,17 @@ const register = (req, res) => {
 }
 
 const login = async (req, res) => {
+
+  
     const { username, password } = req.body; 
+    const r = await axios.get("https://api.chatengine.io/users/me/", {
+    headers: {
+      
+      "Project-ID": CHAT_ENGINE_PROJECT_ID,
+      "User-Name": username,
+      "User-Secret": password,
+    },
+  });
     const user = await User.findOne({ username: username }); 
 
     if (!user) res.status(400).json({ error: "User doesn't exist" })
