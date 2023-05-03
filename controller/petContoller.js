@@ -211,15 +211,11 @@ async function deletepetimgae(req, res) {
     
 
     res.json({ message: 'Image deleted successfully' });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
   }
 }
-
-
-
 module.exports = {
   addPet, getAllpets, addPetwithUser, deletepet, updatePetwithUser, getAllPetsAdmin, updatePetAdmin,deletepetAdmin,deletepetimgae
 }

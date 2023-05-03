@@ -512,28 +512,28 @@ async function BloquerPublication(req, res) {
 
     // envoyer un email********************a activé
 
-    // // Trouver les informations de contact du propriétaire
-    // const proprietaire = await User.findById(publication.user);
-    // const emailDuProprietaire = proprietaire.email;
+    // Trouver les informations de contact du propriétaire
+    const proprietaire = await User.findById(publication.user);
+    const emailDuProprietaire = proprietaire.email;
 
 
-    //   const transporter = nodemailer.createTransport({
-    //     host: "smtp.gmail.com",
-    //     port: 465,
-    //     secure: true,
-    //     auth: {
-    //         user: "testini435@gmail.com",
-    //         pass: "zinehprkliupnwuk",
-    //     },
-    // });
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+            user: "testini435@gmail.com",
+            pass: "zinehprkliupnwuk",
+        },
+    });
 
-    //   // Envoyer l'e-mail au propriétaire
-    //   await transporter.sendMail({
-    //     from: "ghannay.oussama@esprit.tn",
-    //     to: emailDuProprietaire,
-    //     subject: "Votre publication a été bloquée",
-    //     text: `Bonjour ${proprietaire.name}, votre publication avec le titre ${publication.titre} a été bloquée .`
-    //   }).then(()=> console.log("email envoyee"));
+      // Envoyer l'e-mail au propriétaire
+      await transporter.sendMail({
+        from: "ghannay.oussama@esprit.tn",
+        to: emailDuProprietaire,
+        subject: "Votre publication a été bloquée",
+        text: `Bonjour ${proprietaire.name}, votre publication avec le titre ${publication.titre} a été bloquée .`
+      }).then(()=> console.log("email envoyee"));
 
     res.json(publication);
   } catch (err) {
@@ -612,6 +612,9 @@ const accountSid = 'ACabe8903c2aa08c9b767532f5b010c5e9';
 const authToken = '8ca11d517e3dc7dd33a4784050046caf';
 const client = require('twilio')(accountSid, authToken);
 
+
+
+
 async function ActiverPublication(req, res) {
   try {
     const publication = await Publication.findByIdAndUpdate(
@@ -625,46 +628,46 @@ async function ActiverPublication(req, res) {
    //////////////////sms  +  mail////////////////////////
 
 
-    // //*******************envoi de email ** a activé
-    // const proprietaire = await User.findById(publication.user);
-    // const phoneNumber = proprietaire.phone; // Ajouter le numéro de téléphone du propriétaire de la publication
+    //*******************envoi de email ** a activé
+    const proprietaire = await User.findById(publication.user);
+    const phoneNumber = proprietaire.phone; // Ajouter le numéro de téléphone du propriétaire de la publication
 
 
-    // // // Trouver les informations de contact du propriétaire
-    // const emailDuProprietaire = proprietaire.email;
+    // // Trouver les informations de contact du propriétaire
+    const emailDuProprietaire = proprietaire.email;
 
-    // // Configurer le transporteur de messagerie pour l'envoi d'e-mails
-    // const transporter = nodemailer.createTransport({
-    //   host: "smtp.gmail.com",
-    //   port: 465,
-    //   secure: true,
-    //   auth: {
-    //       user: "testini435@gmail.com",
-    //       pass: "zinehprkliupnwuk",
-    //   },
-    // });
+    // Configurer le transporteur de messagerie pour l'envoi d'e-mails
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+          user: "testini435@gmail.com",
+          pass: "zinehprkliupnwuk",
+      },
+    });
 
-    // // Envoyer l'e-mail au propriétaire
-    // await transporter.sendMail({
-    //   from: "ghannay.oussama@esprit.tn",
-    //   to: emailDuProprietaire,
-    //   subject: "Votre publication a été activée",
-    //   text: `Bonjour ${proprietaire.name}, votre publication avec le titre ${publication.titre} a été activée.`
-    // });
+    // Envoyer l'e-mail au propriétaire
+    await transporter.sendMail({
+      from: "ghannay.oussama@esprit.tn",
+      to: emailDuProprietaire,
+      subject: "Votre publication a été activée",
+      text: `Bonjour ${proprietaire.name}, votre publication avec le titre ${publication.titre} a été activée.`
+    });
 
 
-    // //*******************//envoi de email ** a activé
+    //*******************//envoi de email ** a activé
 
-    // // Envoyer un SMS au propriétaire
-    // client.messages
-    //   .create({
-    //      body: `Votre publication avec le titre ${publication.titre} a été activée.`,
-    //      from: '+15076903623',
-    //     //  to: `+21650672974`
-    //      to: `+216${phoneNumber}`
-    //    })
-    //   .then(message => console.log(message.sid))
-    //   .catch(error => console.log(error));
+    // Envoyer un SMS au propriétaire
+    client.messages
+      .create({
+         body: `Votre publication avec le titre ${publication.titre} a été activée.`,
+         from: '+15076903623',
+         to: `+21650672974`
+        //  to: `+216${phoneNumber}`
+       })
+      .then(message => console.log(message.sid))
+      .catch(error => console.log(error));
 
 
 //////////////////sms////////////////////////
