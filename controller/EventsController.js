@@ -1,5 +1,7 @@
 const Event = require('../models/Events');
 const { sign, verify } = require('jsonwebtoken')
+const axios = require('axios');
+const FormData = require('form-data');
 
 const fs = require('fs');
 const User = require('../models/user');
@@ -48,6 +50,33 @@ const getConnectedUserId = (req) => {
 
 
 
+
+const predictedEmotion = async (req, res) => {
+  try {
+    const form = new FormData();
+    const image = req.file;
+    form.append('image', fs.createReadStream(image.path), image.filename);
+
+    const djangoUrl = 'http://localhost:8000/emotion/emotion/result/';
+    const response = await axios.post(djangoUrl, form, {
+      headers: {
+        ...form.getHeaders()
+      },
+    });
+
+    const predictedEmotion = response.data;
+    return res.status(200).json({ predictedEmotion });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Error predicting emotion' });
+  }
+};
+
+
+
+
+
+
 const createEvent = async (req, res) => {
   let { title, description, date, location, image, organizer, organizerPic } = req.body;
 
@@ -79,13 +108,8 @@ const createEvent = async (req, res) => {
       newEvent.image = filename;
     }
 
-    if (req.file && req.file.fieldname === 'organizerPic') {
-      const organizerPicFilename = `${Date.now()}-${req.file.originalname}`;
-      const organizerPicFilepath = `uploads/${organizerPicFilename}`;
-      fs.renameSync(req.file.path, organizerPicFilepath);
-      newEvent.organizerPic = organizerPicFilename;
-    }
-
+    
+console.log(req.body.organizerPic)
     await newEvent.save();
     res.json(newEvent);
   } catch (error) {
@@ -280,4 +304,4 @@ const dislikeEvent = async (req, res) => {
 
 
 
-module.exports = { getAllEvents, getEventById, createEvent, updateEventById, deleteEventById, upload, addAttendeeById, removeAttendeeById, LikeEvent, dislikeEvent };
+module.exports = { getAllEvents, getEventById, createEvent, updateEventById, deleteEventById, upload, addAttendeeById, removeAttendeeById, LikeEvent, dislikeEvent,predictedEmotion };

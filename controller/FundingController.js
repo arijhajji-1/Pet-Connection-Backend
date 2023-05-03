@@ -184,10 +184,11 @@ const avatar = async (req, res) => {
   console.log(img); 
   const url = "https://stablediffusionapi.com/api/v3/img2img";
   const data = {
-    key: "l1UqBXYfTI0Mf0xJtt05VlWXvUls2PiEoGIqdgOehDGetWtJYEIeFHHcsFZ3",
+    key: "xlsKE8GJzLPbg8od2Ox1LZwu9mdtsYILysa00A5XdpE9ovNCo0QNAEYGLIFT",
     prompt: req.body.prompt,
     negative_prompt: null,
     init_image:
+    
       "https://res.cloudinary.com/dszmvlrpt/image/upload/v1681122615/zx7axhxmfpsejucywj7u.jpg",
     width: "512",
     height: "512",

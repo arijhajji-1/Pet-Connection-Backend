@@ -56,6 +56,10 @@ var User = new schema({
     bio: {
         type : String  
     },
+
+    location: {
+        type: String 
+    },
     createdAt: {
         type: Date
     },
@@ -76,6 +80,7 @@ var User = new schema({
             type: Boolean,
             default: false
         },
+
         facebookId: String,
         google: {
         type : Boolean
@@ -84,6 +89,29 @@ var User = new schema({
     passwordResetToken: String,
     passwordResetExpires: Date,
     isUserVerified: {type: Boolean, default: false},
+
+    pets: [
+        {
+          type: schema.Types.ObjectId,
+          ref: 'Pet'
+        }
+      ]  ,
+      losts: [
+        {
+          type: schema.Types.ObjectId,
+          ref: 'lost'
+        }
+      ]  ,
+      notification:{
+        type:Array
+      } ,
+    
+    cart:
+    {
+        type: schema.Types.ObjectId,
+        ref: 'Cart'
+    }
+
 });
 
 
@@ -103,6 +131,7 @@ User.methods.createPasswordResetToken = async function () {
 
   
     }
+
 
 };
 
