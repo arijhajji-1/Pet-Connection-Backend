@@ -20,6 +20,7 @@ const paymentRoutes=require("./routes/Marketplace/payment");
 
 
 
+
 // =========== Database Connection ==============
 mongo.connect("mongodb+srv://yosramekaoui:yosra@cluster0.aalwf4q.mongodb.net/ace?retryWrites=true&w=majority"
 ).then(()=>console.log("Db Connect")).catch((err)=>{
@@ -51,6 +52,7 @@ app.use(session({
   cookie: { secure: false } // Set to true if using HTTPS
 }));
 
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // ============ routes =================
 var useRouter = require('./routes/User/user'); 
@@ -62,6 +64,7 @@ app.use('/event',eventRouter);
 app.use(express.static("public"));
 app.use(express.static('uploads'));
 app.use('/public/uploads',express.static('public/uploads'));
+app.use(express.static('public/audio'));
 
 
 // ========== Upgrade =================
@@ -95,10 +98,14 @@ app.use('/coupon', couponRouter);
 app.use('/payment',paymentRoutes);
 app.use(express.static('public'));
 
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 
 
-
+//======= podcast ====///
+var podcastRouter = require('./routes/Podcast/podcast');
+app.use('/podcast', podcastRouter);
 
 
 
