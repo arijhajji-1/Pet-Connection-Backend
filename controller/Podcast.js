@@ -96,13 +96,13 @@ const deletePodcastById = async (req, res) => {
   try {
     const podcast = await Podcast.findById(req.params.id);
     await podcast.remove();
-    // Delete the audio file associated with the podcast
-    fs.unlinkSync(podcast.audioPath);
+   
     res.json({ message: 'Podcast deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 module.exports = {
   getAllPodcasts,
