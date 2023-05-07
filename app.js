@@ -171,23 +171,22 @@ app.use('/uploads', express.static('uploads'));
 var petRouter = require('./routes/Pet/pet'); 
 // endpoint for chatGpt 
 const config=new Configuration({
-  apiKey:"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",
+  apiKey:"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",
 })
 const openai=new OpenAIApi(config);
 
-
-// app.post("/chat",async(req,res)=>{
-//   const {prompt}=req.body;
-//   console.log(prompt)
-//   const completion =await openai.createCompletion({
-//     model:"text-davinci-003",
-//     max_tokens:512,
-//     temperature:0,
-//     prompt:prompt,
-//   });
-//   res.send(completion.data.choices[0].text); 
-// })
-const animalKeywords = ["cat", "dog", "pet", "animal", "puppy", "kitten", "hamster", "rabbit", "fish"];
+app.post("/description",async(req,res)=>{
+  const {prompt}=req.body;
+  console.log(prompt)
+  const completion =await openai.createCompletion({
+    model:"text-davinci-003",
+    max_tokens:512,
+    temperature:0,
+    prompt:prompt,
+  });
+  res.send(completion.data.choices[0].text); 
+})
+const animalKeywords = ["cat", "dog", "pet", "animal", "puppy", "kitten", "hamster", "rabbit", "fish","hi"];
 
 app.post("/chat", async (req, res) => {
   const { prompt } = req.body;
@@ -196,12 +195,10 @@ app.post("/chat", async (req, res) => {
   const containsKeyword = animalKeywords.some((keyword) =>
     prompt.toLowerCase().includes(keyword)
   );
-
   if (!containsKeyword) {
     res.send("Sorry, I can only answer questions about pets and animals.");
     return;
   }
-
   console.log(prompt);
   const completion = await openai.createCompletion({
     model: "text-davinci-003",
