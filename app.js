@@ -18,8 +18,13 @@ const axios = require('axios');
 
 const path = require("path");
 const paymentRoutes=require("./routes/Marketplace/payment");
+
 const CHAT_ENGINE_PROJECT_ID = "bccb6fcd-364e-424e-934a-1c8cd591efaa";
 const CHAT_ENGINE_PRIVATE_KEY = "e057975e-54d5-44a8-9a78-1fa71c1967a4";
+
+const scrapRoutes=require("./routes/articlesScrapRoutes");
+
+
 
 
 // =========== Database Connection ==============
@@ -55,6 +60,7 @@ app.use(session({
   cookie: { secure: false } // Set to true if using HTTPS
 }));
 
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // ============ routes =================
 var useRouter = require('./routes/User/user'); 
@@ -66,6 +72,7 @@ app.use('/event',eventRouter);
 app.use(express.static("public"));
 app.use(express.static('uploads'));
 app.use('/public/uploads',express.static('public/uploads'));
+app.use(express.static('public/audio'));
 
 
 // ========== Upgrade =================
@@ -97,12 +104,17 @@ app.use('/', orderRouter);
 var couponRouter = require('./routes/Marketplace/coupon'); 
 app.use('/coupon', couponRouter);
 app.use('/payment',paymentRoutes);
+app.use('/scrap',scrapRoutes);
 app.use(express.static('public'));
 
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 
 
-
+//======= podcast ====///
+var podcastRouter = require('./routes/Podcast/podcast');
+app.use('/podcast', podcastRouter);
 
 
 
@@ -141,7 +153,7 @@ app.use('/comment', CommnetRouter);
 
 
 
-// =============== google auth ======= 
+// =============== google auth =======
 // app.use(
 //   cookieSession({
 //     name: "session",
@@ -151,18 +163,50 @@ app.use('/comment', CommnetRouter);
 // )
 
 
-// app.use(passport.initialize()); 
-// app.use(passport.session()); 
-// app.use("/auth", authRoute); 
+// app.use(passport.initialize());
+// app.use(passport.session());
+// app.use("/auth", authRoute);
+
+
+
+
+
+
 
  
 
 // ========= server creation =============
 const server = http.createServer(app); 
+
+
+// ============= MEET CALL =====================
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
+
+io.on("connection", (socket) => {
+  socket.emit("me", socket.id);
+
+  socket.on("disconnect", () => {
+    socket.broadcast.emit("callEnded");
+  });
+
+  socket.on("callUser", ({ userToCall, signalData, from, name }) => {
+    io.to(userToCall).emit("callUser", { signal: signalData, from, name });
+  });
+
+  socket.on("answerCall", (data) => {
+    io.to(data.to).emit("callAccepted", data.signal);
+  });
+});
+
+
+
+
 server.listen(3000, () => console.log('server'))
-
-
-//================//
 
 //============= router Pet =================
 // Serve static files from the "uploads" directory
