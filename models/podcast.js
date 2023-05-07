@@ -25,11 +25,7 @@ const podcastSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  playlist: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Playlist',
-    default: null,
-  },
+
 });
 
 module.exports = mongoose.model('podcasts', podcastSchema);
