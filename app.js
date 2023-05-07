@@ -7,6 +7,8 @@ const cors = require('cors');
 const session = require('express-session')
 const path = require("path");
 const paymentRoutes=require("./routes/Marketplace/payment");
+const scrapRoutes=require("./routes/articlesScrapRoutes");
+
 
 // =========== Database Connection ==============
 mongo.connect("mongodb+srv://yosramekaoui:yosra@cluster0.aalwf4q.mongodb.net/ace?retryWrites=true&w=majority"
@@ -45,6 +47,7 @@ app.use('/', orderRouter);
 var couponRouter = require('./routes/Marketplace/coupon'); 
 app.use('/coupon', couponRouter);
 app.use('/payment',paymentRoutes);
+app.use('/scrap',scrapRoutes);
 app.use(express.static('public'));
 
 
