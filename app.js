@@ -17,6 +17,8 @@ const {Configuration,OpenAIApi}=require("openai")
 
 const path = require("path");
 const paymentRoutes=require("./routes/Marketplace/payment");
+const scrapRoutes=require("./routes/articlesScrapRoutes");
+
 
 
 
@@ -96,6 +98,7 @@ app.use('/', orderRouter);
 var couponRouter = require('./routes/Marketplace/coupon'); 
 app.use('/coupon', couponRouter);
 app.use('/payment',paymentRoutes);
+app.use('/scrap',scrapRoutes);
 app.use(express.static('public'));
 
 app.use(bodyParser.json({ limit: '50mb' }));
