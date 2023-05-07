@@ -173,8 +173,8 @@ var petRouter = require('./routes/Pet/pet');
 const config=new Configuration({
   apiKey:"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",
 })
-const openai=new OpenAIApi(config);
 
+const openai=new OpenAIApi(config);
 app.post("/description",async(req,res)=>{
   const {prompt}=req.body;
   console.log(prompt)
