@@ -8,7 +8,6 @@ const { sign, verify } = require('jsonwebtoken')
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-
 const CHAT_ENGINE_PROJECT_ID = "bccb6fcd-364e-424e-934a-1c8cd591efaa";
 const CHAT_ENGINE_PRIVATE_KEY = "e057975e-54d5-44a8-9a78-1fa71c1967a4";
 
@@ -307,31 +306,6 @@ const register = (req, res) => {
 
 
 const login = async (req, res) => {
-
-
-  
-    const { username, password } = req.body; 
-    const r = await axios.get("https://api.chatengine.io/users/me/", {
-    headers: {
-      
-      "Project-ID": CHAT_ENGINE_PROJECT_ID,
-      "User-Name": username,
-      "User-Secret": password,
-    },
-  });
-    const user = await User.findOne({ username: username }); 
-
-    if (!user) res.status(400).json({ error: "User doesn't exist" })
-    else if (user.active == true ) {
-        const dbPassword = user.password
-        bcrypt.compare(password, dbPassword).then((match) => {
-            if (!match) {
-                res.status(400).json({
-                    error: "Wrong username and password combination"
-                })
-            } else {
-                const accessToken = createToken(user);
-                res.cookie("access-token", accessToken, {
 
   
   const { username, password } = req.body; 

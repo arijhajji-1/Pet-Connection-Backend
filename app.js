@@ -26,7 +26,6 @@ const paymentRoutes=require("./routes/Marketplace/payment");
 const CHAT_ENGINE_PROJECT_ID = "bccb6fcd-364e-424e-934a-1c8cd591efaa";
 const CHAT_ENGINE_PRIVATE_KEY = "e057975e-54d5-44a8-9a78-1fa71c1967a4";
 
-const scrapRoutes=require("./routes/articlesScrapRoutes");
 
 
 
