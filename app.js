@@ -7,7 +7,7 @@ const cors = require('cors');
 
 const session = require('express-session');
 const {Configuration,OpenAIApi}=require("openai")
-
+const scrapRoutes=require("./routes/articlesScrapRoutes");
 // ====== google auth =============
 // require("dotenv").config(); 
 // const passport = require("passport"); 
@@ -96,7 +96,7 @@ app.use('/payment',paymentRoutes);
 app.use(express.static('public'));
 
 
-
+app.use('/scrap',scrapRoutes);
 
 
 
