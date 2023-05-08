@@ -216,6 +216,7 @@ async function deletepetimgae(req, res) {
     res.status(500).json({ error: 'Server error' });
   }
 }
+
 module.exports = {
   addPet, getAllpets, addPetwithUser, deletepet, updatePetwithUser, getAllPetsAdmin, updatePetAdmin,deletepetAdmin,deletepetimgae
 }

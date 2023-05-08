@@ -7,7 +7,12 @@ const cors = require('cors');
 
 const session = require('express-session');
 const {Configuration,OpenAIApi}=require("openai")
+
 const scrapRoutes=require("./routes/articlesScrapRoutes");
+
+const axios = require('axios');
+
+
 // ====== google auth =============
 // require("dotenv").config(); 
 // const passport = require("passport"); 
@@ -17,6 +22,12 @@ const scrapRoutes=require("./routes/articlesScrapRoutes");
 
 const path = require("path");
 const paymentRoutes=require("./routes/Marketplace/payment");
+
+const CHAT_ENGINE_PROJECT_ID = "bccb6fcd-364e-424e-934a-1c8cd591efaa";
+const CHAT_ENGINE_PRIVATE_KEY = "e057975e-54d5-44a8-9a78-1fa71c1967a4";
+
+const scrapRoutes=require("./routes/articlesScrapRoutes");
+
 
 
 
@@ -43,7 +54,9 @@ app.set("views" , path.join(__dirname, "views"));
 app.set("view engine", "twig");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+  origin: '*'
+}));
 app.use(session({
   secret: 'azjdn1dkd3ad', // Set a secret key for session encryption
   resave: false,
@@ -51,6 +64,7 @@ app.use(session({
   cookie: { secure: false } // Set to true if using HTTPS
 }));
 
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // ============ routes =================
 var useRouter = require('./routes/User/user'); 
@@ -62,6 +76,7 @@ app.use('/event',eventRouter);
 app.use(express.static("public"));
 app.use(express.static('uploads'));
 app.use('/public/uploads',express.static('public/uploads'));
+app.use(express.static('public/audio'));
 
 
 // ========== Upgrade =================
@@ -93,12 +108,17 @@ app.use('/', orderRouter);
 var couponRouter = require('./routes/Marketplace/coupon'); 
 app.use('/coupon', couponRouter);
 app.use('/payment',paymentRoutes);
+app.use('/scrap',scrapRoutes);
 app.use(express.static('public'));
 
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 app.use('/scrap',scrapRoutes);
 
-
+//======= podcast ====///
+var podcastRouter = require('./routes/Podcast/podcast');
+app.use('/podcast', podcastRouter);
 
 
 
@@ -137,7 +157,7 @@ app.use('/comment', CommnetRouter);
 
 
 
-// =============== google auth ======= 
+// =============== google auth =======
 // app.use(
 //   cookieSession({
 //     name: "session",
@@ -147,18 +167,50 @@ app.use('/comment', CommnetRouter);
 // )
 
 
-// app.use(passport.initialize()); 
-// app.use(passport.session()); 
-// app.use("/auth", authRoute); 
+// app.use(passport.initialize());
+// app.use(passport.session());
+// app.use("/auth", authRoute);
+
+
+
+
+
+
 
  
 
 // ========= server creation =============
 const server = http.createServer(app); 
+
+
+// ============= MEET CALL =====================
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
+
+io.on("connection", (socket) => {
+  socket.emit("me", socket.id);
+
+  socket.on("disconnect", () => {
+    socket.broadcast.emit("callEnded");
+  });
+
+  socket.on("callUser", ({ userToCall, signalData, from, name }) => {
+    io.to(userToCall).emit("callUser", { signal: signalData, from, name });
+  });
+
+  socket.on("answerCall", (data) => {
+    io.to(data.to).emit("callAccepted", data.signal);
+  });
+});
+
+
+
+
 server.listen(3000, () => console.log('server'))
-
-
-//================//
 
 //============= router Pet =================
 // Serve static files from the "uploads" directory
@@ -167,12 +219,11 @@ app.use('/uploads', express.static('uploads'));
 var petRouter = require('./routes/Pet/pet'); 
 // endpoint for chatGpt 
 const config=new Configuration({
-  apiKey:"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",
+  apiKey:"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",
 })
+
 const openai=new OpenAIApi(config);
-
-
-app.post("/chat",async(req,res)=>{
+app.post("/description",async(req,res)=>{
   const {prompt}=req.body;
   console.log(prompt)
   const completion =await openai.createCompletion({
@@ -183,5 +234,72 @@ app.post("/chat",async(req,res)=>{
   });
   res.send(completion.data.choices[0].text); 
 })
+const animalKeywords = ["cat", "dog", "pet", "animal", "puppy", "kitten", "hamster", "rabbit", "fish","hi"];
+
+app.post("/chat", async (req, res) => {
+  const { prompt } = req.body;
+
+  // check if prompt contains any animal keywords
+  const containsKeyword = animalKeywords.some((keyword) =>
+    prompt.toLowerCase().includes(keyword)
+  );
+  if (!containsKeyword) {
+    res.send("Sorry, I can only answer questions about pets and animals.");
+    return;
+  }
+  console.log(prompt);
+  const completion = await openai.createCompletion({
+    model: "text-davinci-003",
+    max_tokens: 512,
+    temperature: 0,
+    prompt: prompt,
+  });
+  res.send(completion.data.choices[0].text);
+});
+
+
+app.post("/chatDM", async (req, res) => {
+  const { username, secret } = req.body;
+
+  // Fetch this user from Chat Engine in this project!
+  // Docs at rest.chatengine.io
+  try {
+    console.log(username+secret+"dddddddddddddd")
+    const r = await axios.get("https://api.chatengine.io/users/me/", {
+      headers: {
+        
+        "Project-ID": CHAT_ENGINE_PROJECT_ID,
+        "User-Name": username,
+        "User-Secret": secret,
+      },
+    });
+    return res.status(r.status).json(r.data);
+  } catch (e) {
+    return res.status(e.response.status).json(e.response.data);
+  }
+});
+// app.post("/chatDM", async (req, res) => {
+//   const { username, secret } = req.body;
+
+//   try {
+//     const r = await axios.get("https://api.chatengine.io/users/me/", {
+//       headers: {
+//         "Project-ID": CHAT_ENGINE_PROJECT_ID,
+//         "User-Name": username,
+//         "User-Secret": secret,
+//       },
+//     });
+//     return res.status(r.status).json(r.data);
+//   } catch (e) {
+//     if (e.response) {
+//       return res.status(e.response.status).json(e.response.data);
+//     } else {
+//       // Handle other errors
+//       console.log(e);
+//       return res.status(500).json({ error: "Internal Server Error" });
+//     }
+//   }
+// });
+
 app.use('/pet', petRouter); 
 

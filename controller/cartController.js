@@ -181,6 +181,7 @@ exports.updateCart = async (req,res) => {
         res.status(500).json(err)
     }
 }
+
 exports.deleteCart = async (req, res) => {
     try {
       await Cart.findOneAndDelete({ userId: req.params.id });
@@ -201,6 +202,7 @@ exports.deleteCart = async (req, res) => {
   }
 
   //Get User Carts
+  
   
   exports.getCartById = async (req, res) => {
     try {

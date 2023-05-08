@@ -12,3 +12,4 @@ router.get("/getInformations",articleScrapController.getInformations);
 router.get("/getInformation",articleScrapController.getInformation);
 
 module.exports = router; 
+
