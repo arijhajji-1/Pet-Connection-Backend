@@ -15,7 +15,8 @@ const { createToken, validateToken } = require('../../midill/JWT/JWT');
 const { register, login, profile, getAll, updateUser, deleteUser, banUser, 
       logout,twofactorverification,disableTwoFactor,enableTwoFactor,facebooklogin ,
        loginGoogle, promoteUser,updateuser,getUserImage,upload,passwordResetCtrl,
-       forgetPasswordToken,updateUserPasswordCtrl,verifyUser,addUser,updateuseradmin,getuserInfo } = require("../../controller/UserController")
+       forgetPasswordToken,updateUserPasswordCtrl,verifyUser,addUser,updateuseradmin,
+       getuserInfo,uploadd,regenize2 ,loginFaceRecognition} = require("../../controller/UserController")
 
 
 
@@ -25,6 +26,7 @@ const { register, login, profile, getAll, updateUser, deleteUser, banUser,
  
 router.post("/register", register)
 router.get("/verify/:userId", verifyUser)
+
 router.post("/login", login )
 
 router.get("/all", getAll )
@@ -73,6 +75,22 @@ router.put("/update/:id", updateUser)
 
 router.get("/userInfo/:iduser/userInfo", getuserInfo)
 
+
+
+///////////face rec//////////
+
+
+router.post('/detect2', uploadd.none(),regenize2);
+
+
+router.post('/loginFaceRecognition',loginFaceRecognition);
+
+
+
+
+
+
+//////////////////////////
 
 
 

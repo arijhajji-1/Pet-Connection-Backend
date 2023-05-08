@@ -7,7 +7,11 @@ const cors = require('cors');
 
 const session = require('express-session');
 const {Configuration,OpenAIApi}=require("openai")
+
+const scrapRoutes=require("./routes/articlesScrapRoutes");
+
 const axios = require('axios');
+
 
 // ====== google auth =============
 // require("dotenv").config(); 
@@ -110,7 +114,7 @@ app.use(express.static('public'));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-
+app.use('/scrap',scrapRoutes);
 
 //======= podcast ====///
 var podcastRouter = require('./routes/Podcast/podcast');
